@@ -195,8 +195,6 @@
 
   <!-- ======================== SCENE 01 · THE PROBLEM ======================== -->
   <div class="scene scene--1" data-scene="01">
-    <!-- Dotted wave surface (three.js), lazy-loaded when this scene nears the viewport. -->
-    <div class="dotted-surface" data-dotted-surface data-size="8" data-opacity="0.45" aria-hidden="true"><div class="dotted-surface__layer"></div></div>
     <div class="shell"><div class="scene-slate" data-reveal><span class="scene-slate__no">Scene 01</span><span class="scene-slate__rule"></span><span class="scene-slate__title">The problem</span></div></div>
   <!-- ============================== IDEA ============================== -->
   <section class="pb-[clamp(64px,10vw,140px)]" data-reveal>
@@ -243,7 +241,12 @@
   <!-- ============================== ARITHMETIC ============================== -->
   <!-- Moved up into Scene 01: it states the problem the rest of the page solves.
        One table instead of two cards, so each "before" sits beside its "after". -->
-  <section class="pb-[clamp(56px,8vw,104px)]">
+  <!-- `relative isolate` gives the dotted surface (z -1) this section as its backdrop. -->
+  <section class="relative isolate pb-[clamp(56px,8vw,104px)]">
+    <!-- Dotted wave surface (three.js), lazy-loaded near the viewport. Animated, but only
+         behind this section and scrolling with it — a layer that stayed fixed on screen
+         while whole scenes slid over it read as odd. -->
+    <div class="dotted-surface" data-dotted-surface data-size="8" data-opacity="0.45" aria-hidden="true"><div class="dotted-surface__layer"></div></div>
     <div class="shell">
       <div class="mb-[clamp(36px,6vw,68px)] flex flex-col gap-5" data-reveal>
         <p class="eyebrow">The arithmetic</p>

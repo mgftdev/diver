@@ -243,7 +243,7 @@ rates) → **Finale** (FAQ + booking). Each scene is a `.scene[data-scene]` wrap
   large text) were lifted from values that failed AA (3.74 and 1.60 — half the H1 was
   below the minimum). Marquee names #5b5d6a (3.07:1). Keep these as the floor.
 
-### The dotted surface (Scene 01)
+### The dotted surface (behind the comparison table)
 
 A three.js dotted wave (`modules/dottedSurface.js`), ported from a React/shadcn
 "DottedSurface" the owner supplied. Not ported as React on purpose — this site has no
@@ -254,11 +254,21 @@ mean rewriting the site.
   straight from `node_modules/three/build` (0.186 ships no minified build: ~2 MB,
   compressed on the wire). **Bundling/minifying three is the biggest remaining payload
   win** if performance becomes a concern.
-- It is `import()`ed only when Scene 01 comes within 600px of the viewport, renders into
-  a sticky viewport-tall layer inside the scene, pauses off screen and in hidden tabs,
-  and draws one still frame under reduced motion.
-- The host must not get `overflow: hidden` — it would become the sticky layer's scroll
-  container and the layer would stop sticking.
+- It is `import()`ed only when Scene 01 comes within 600px of the viewport.
+- **Only behind the comparison table**, animated, and scrolling with that section: the
+  host sits inside the arithmetic `<section>` (which is `relative isolate`, so the
+  surface's `z-index: -1` has that section as its backdrop) and the layer fills it
+  (`inset: 0`). History, so nobody re-tries the rejected versions: it began sticky
+  across the whole of Scene 01 (a fixed, moving floor with scenes sliding over it — the
+  owner found it odd on scroll), then became a static floor (rejected: sparse dots, no
+  life). `data-motion="static"` still exists as an option; it is not used.
+- **Denser than the original** at the owner's request ("more concentrated"): 85 units
+  apart instead of 150, 70×106 points instead of 40×60 — same ~6000×9000 area, 3× the
+  points. The wave formula was per point *index*, so `WAVE_SCALE = SEPARATION / 150`
+  keeps the wave shape in world units; without it, tighter spacing also tightens waves.
+- With no loop running (static mode, paused, hidden tab) `resize()` repaints itself. Animation state is
+  declared before the first `resize()` call — it reads `frame`, and declaring it after
+  was a temporal-dead-zone crash that `node --check` does not catch.
 - The original's colour buffer used 0–255 values in a 0–1 attribute (every dot clamped
   to white); the port uses real 0–1 colours read from the design tokens.
 - Testing in a hidden preview pane: `IntersectionObserver` never fires there. Stub it to
