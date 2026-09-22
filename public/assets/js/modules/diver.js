@@ -24,6 +24,10 @@ const LOAD_CONCURRENCY = 4;
 // Phones draw a 340px figure; every second frame is plenty there and halves the
 // decoded-bitmap memory, which is what actually runs out on a phone.
 const NARROW_QUERY = '(max-width: 767px)';
+// The tool band starts translucent (60%) and is fully opaque after this much scroll,
+// so the held diver disappears under it instead of showing through.
+const CURTAIN_REST = 60;
+const CURTAIN_CLOSED_PX = 120;
 
 export function initDiver() {
   const rig = document.querySelector('[data-diver]');
@@ -34,6 +38,8 @@ export function initDiver() {
 
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
+
+  const curtain = document.querySelector('[data-diver-curtain]');
 
   const step = window.matchMedia(NARROW_QUERY).matches ? 2 : 1;
   const indices = [];
@@ -106,7 +112,8 @@ export function initDiver() {
     const blend = position - base;
     const hold = Math.round(Math.min(scrolled, turnDistance));
 
-    const key = `${base}|${blend.toFixed(2)}|${hold}`;
+    const closed = Math.min(1, scrolled / CURTAIN_CLOSED_PX);
+    const key = `${base}|${blend.toFixed(2)}|${hold}|${closed.toFixed(2)}`;
     if (key === lastKey) return;
     lastKey = key;
 
@@ -127,6 +134,13 @@ export function initDiver() {
     // there mix-blend-mode loses the hero glow behind it: the render's black shows
     // as a box again. Verified by A/B in the browser, not assumed.
     rig.style.transform = `translate(0, ${hold}px)`;
+
+    // Mixed from the ink-2 token rather than a literal, so the band keeps following
+    // the theme. At 0 scroll this equals the markup's own bg-ink-2/60.
+    if (curtain) {
+      const opacity = Math.round(CURTAIN_REST + (100 - CURTAIN_REST) * closed);
+      curtain.style.backgroundColor = `color-mix(in oklab, var(--color-ink-2) ${opacity}%, transparent)`;
+    }
   };
 
   const schedule = () => {
@@ -168,6 +182,7 @@ export function initDiver() {
     window.removeEventListener('resize', onResize);
     canvas.removeAttribute('data-ready');
     rig.style.removeProperty('transform');
+    curtain?.style.removeProperty('background-color');
     lastKey = '';
   };
 

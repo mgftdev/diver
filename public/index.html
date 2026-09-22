@@ -165,9 +165,10 @@
     </div>
 
     <!-- Tool marquee -->
-    <!-- Translucent, like the stat tiles: the diver passes behind the tool names
-         instead of being sliced off by an opaque band. -->
-    <div class="mt-[clamp(44px,7vw,88px)] border-y border-edge bg-ink-2/60 py-5 backdrop-blur-[2px]">
+    <!-- The curtain: translucent at rest, so the band does not slice the diver's torso
+         in a straight line; modules/diver.js turns it opaque over the first ~120px of
+         scroll, so the held diver disappears under it as the page rises. -->
+    <div data-diver-curtain class="mt-[clamp(44px,7vw,88px)] border-y border-edge bg-ink-2/60 py-5 backdrop-blur-[2px]">
       <p class="eyebrow mb-4 text-center">Built on · <b>subscriptions on us</b></p>
       <div class="overflow-hidden mask-fade-x">
         <div class="flex w-max animate-marquee gap-14" data-marquee aria-hidden="true">

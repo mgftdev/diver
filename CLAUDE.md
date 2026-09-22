@@ -158,8 +158,13 @@ Regression checks for the figure:
 - A preview pane that is hidden pauses `requestAnimationFrame`, so scroll-driven renders
   never fire there. Test by scrolling and then dispatching `resize` — the module's resize
   path renders through `setTimeout`.
-- **The band is translucent on purpose** (`bg-ink-2/60` + `backdrop-blur-[2px]`). An
-  opaque band slices the figure in a straight line across the hero.
+- **The band is a curtain** (`[data-diver-curtain]`). At rest it is translucent
+  (`bg-ink-2/60`), because an opaque band slices the figure in a straight line across
+  the hero. `diver.js` then raises it to fully opaque over the first 120px of scroll, so
+  the held diver disappears *under* it as the page rises (owner's request) instead of
+  showing through. The opacity is written as `color-mix(… var(--color-ink-2) N% …)` —
+  from the token, and it equals the markup's own class at 0 scroll. Regression check:
+  band alpha is 0.6 at scroll 0 and 1 at scroll ≥ 120.
 
 ## The tool marquee
 
@@ -249,6 +254,52 @@ mean rewriting the site.
   to white); the port uses real 0–1 colours read from the design tokens.
 - Testing in a hidden preview pane: `IntersectionObserver` never fires there. Stub it to
   report "intersecting" and `import()` the module with a cache-busting query.
+
+## Deploy — GitHub Pages
+
+Repository: https://github.com/mgftdev/diver (public — required for Pages on a free
+account). Live at **https://mgftdev.github.io/diver/**. Every push to `main` runs
+`.github/workflows/deploy.yml`: `npm ci` → `npm run build` (Tailwind) →
+`npm run build:static` → upload `dist/` → publish. A failed build never replaces the
+live site. One-time repo setting: **Settings → Pages → Source: GitHub Actions**.
+
+**Pages is static.** The Express server is not deployed; `public/` stays exactly as it
+runs locally, and `scripts/build-static.mjs` adapts only the copy in `dist/`:
+
+- Prefixes root-absolute URLs (`href`/`src`/`content`/`data-frames` in HTML, string
+  literals in JS) with `BASE_PATH`, which CI takes from `actions/configure-pages`
+  (`/diver`). Empty for a custom domain at the root.
+- Bundles `three.module.js` + `three.core.js` into one minified module at
+  `dist/vendor/three/three.module.js` (2.07 MB → 725 KB) — the path `dottedSurface.js`
+  already imports.
+- Drops `admin.html`/`admin.js`, writes `.nojekyll`.
+- **Fails** if a root-absolute URL survives, if `site.css` is missing, or if
+  `BASE_PATH` is not a URL path. **Notes** (does not fail) the `/api/` calls.
+
+Consequences that are live on Pages until changed:
+
+- **The booking form cannot submit** — `/api/leads` does not exist there; the form
+  shows its error message. Fix: point the form at a hosted form service (Web3Forms or
+  Formspree), which is a small change to `api.js`/`leadForm.js` — deliberately not made
+  yet: the owner asked for no changes to the site code in the deploy step.
+- `/api/availability` 404s; `availability.js` keeps the month and slot number written in
+  the HTML, so update those by hand.
+- No Helmet CSP headers (Pages cannot set headers).
+
+Testing the Pages build locally — serve `dist/` under `/diver/`, not at the root, or
+path bugs stay invisible:
+
+```bash
+npm run build && MSYS_NO_PATHCONV=1 BASE_PATH=/diver npm run build:static
+# then copy dist/ to <tmp>/diver/ and run: python -m http.server 8766 in <tmp>
+```
+
+`MSYS_NO_PATHCONV=1` matters in Git Bash on Windows: without it `BASE_PATH=/diver` is
+silently rewritten to `C:/Program Files/Git/diver` (the script now refuses that).
+
+Kept out of the public repo by `.gitignore`: `.env`, lead data, `dist/`, `diver.mp4` (the
+Kling clip with its watermark), `kling/`, the root `robot*.png` renders, `.claude/`.
+Commits use `mgftdev@users.noreply.github.com` so no personal address is published.
 
 ## Verifying visual work
 
