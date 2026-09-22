@@ -1,0 +1,739 @@
+<title>Double Take Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200..800&family=Golos+Text:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* ===== TOKENS — committed single dark world ===== */
+:root{
+  color-scheme: dark;
+  --ink:#08080B;
+  --ink-2:#0B0C10;
+  --panel:#11121A;
+  --panel-2:#171926;
+  --line:#20222E;
+  --line-hi:#2E313F;
+  --fg:#F4F3F1;
+  --fg-dim:#9B9CA8;
+  --fg-mute:#686A78;
+  --amber:#FF6A1A;
+  --amber-hi:#FFB25C;
+  --amber-deep:#B33F06;
+  --glow:rgba(255,106,26,.16);
+
+  --display:"Unbounded","Trebuchet MS",sans-serif;
+  --body:"Golos Text","Segoe UI",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+
+  --gutter:clamp(18px,4vw,64px);
+  --max:1280px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--fg);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{max-width:100%}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:2px}
+
+.wrap{width:100%;max-width:var(--max);margin-inline:auto;padding-inline:var(--gutter)}
+
+/* ===== shared type roles ===== */
+.eyebrow{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--fg-mute);
+  margin:0;
+}
+.eyebrow b{color:var(--amber);font-weight:500}
+.h2{
+  font-family:var(--display);
+  font-weight:300;
+  font-size:clamp(2rem,5.4vw,4.2rem);
+  line-height:.98;
+  letter-spacing:-.035em;
+  text-wrap:balance;
+  margin:0;
+}
+.h3{
+  font-family:var(--display);
+  font-weight:400;
+  font-size:clamp(1.05rem,2vw,1.35rem);
+  letter-spacing:-.02em;
+  line-height:1.15;
+  margin:0;
+}
+.lede{
+  font-size:clamp(1rem,1.5vw,1.125rem);
+  color:var(--fg-dim);
+  max-width:62ch;
+  margin:0;
+}
+.dim{color:#31333F}
+
+/* ===== buttons ===== */
+.btn{
+  display:inline-flex;align-items:center;gap:.6em;
+  font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  padding:1.15em 2em;border-radius:999px;border:1px solid var(--line-hi);
+  background:transparent;color:var(--fg);cursor:pointer;
+  transition:background .25s ease,border-color .25s ease,color .25s ease,transform .25s ease;
+}
+.btn:hover{border-color:var(--fg-dim);transform:translateY(-1px)}
+.btn-solid{background:var(--fg);color:#0A0A0D;border-color:var(--fg);font-weight:500}
+.btn-solid:hover{background:var(--amber-hi);border-color:var(--amber-hi);color:#1A0B02}
+.btn-amber{background:var(--amber);border-color:var(--amber);color:#180800;font-weight:500}
+.btn-amber:hover{background:var(--amber-hi);border-color:var(--amber-hi)}
+
+/* ===== nav ===== */
+.nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(8,8,11,.78);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.nav-in{display:flex;align-items:center;gap:24px;padding-block:14px}
+.logo{
+  font-family:var(--display);font-weight:500;font-size:19px;letter-spacing:-.05em;
+  display:flex;align-items:baseline;gap:.35em;white-space:nowrap;
+}
+.logo i{
+  font-style:normal;width:6px;height:6px;border-radius:50%;
+  background:var(--amber);box-shadow:0 0 12px var(--amber);
+  display:inline-block;
+}
+.nav-links{display:flex;gap:28px;margin-inline:auto;font-size:14px;color:var(--fg-dim)}
+.nav-links a{position:relative;padding-block:4px;transition:color .2s ease}
+.nav-links a:hover{color:var(--fg)}
+.nav-links a::after{
+  content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--amber);
+  transition:right .28s ease;
+}
+.nav-links a:hover::after{right:0}
+.nav .btn{padding:.85em 1.5em}
+
+/* ===== hero ===== */
+.hero{position:relative;padding-block:clamp(56px,9vw,104px) clamp(40px,6vw,72px);overflow:hidden}
+.hero::before{
+  content:"";position:absolute;inset:-20% -10% auto;height:120%;
+  background:radial-gradient(52% 46% at 50% 34%,var(--glow),transparent 70%);
+  pointer-events:none;
+}
+.hero::after{
+  content:"";position:absolute;left:50%;top:0;width:1px;height:62%;
+  background:linear-gradient(180deg,transparent,var(--amber),transparent);
+  opacity:.5;pointer-events:none;
+}
+.hero-in{position:relative}
+.slate{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin-bottom:clamp(28px,5vw,56px)}
+.slate span{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--fg-mute)}
+.slate .rec{display:inline-flex;align-items:center;gap:.5em;color:var(--amber)}
+.slate .rec::before{
+  content:"";width:7px;height:7px;border-radius:50%;background:var(--amber);
+  animation:pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+.title{
+  font-family:var(--display);font-weight:200;
+  font-size:clamp(3rem,13.5vw,11.5rem);
+  line-height:.84;letter-spacing:-.055em;
+  margin:0;
+}
+.title-row{position:relative;display:block}
+.title-row .echo{
+  position:absolute;left:0;top:.09em;z-index:-1;
+  color:transparent;-webkit-text-stroke:1px #1C1E29;
+  pointer-events:none;
+}
+.title .lo{display:block;padding-left:clamp(0px,14vw,290px);font-weight:300}
+
+.hero-body{
+  display:grid;grid-template-columns:1fr auto;gap:clamp(24px,4vw,56px);
+  align-items:end;margin-top:clamp(32px,5vw,64px);
+}
+.hero-copy{display:flex;flex-direction:column;gap:26px;max-width:46ch}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.play{
+  display:inline-flex;align-items:center;gap:.7em;
+  font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--fg-dim);padding:1.15em .5em;transition:color .2s ease;
+}
+.play:hover{color:var(--fg)}
+.play s{
+  text-decoration:none;width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--line-hi);display:grid;place-items:center;
+  transition:border-color .25s ease,background .25s ease;
+}
+.play:hover s{border-color:var(--amber);background:rgba(255,106,26,.1)}
+
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.stat{background:var(--ink-2);padding:20px 22px 18px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.stat b{
+  font-family:var(--display);font-weight:300;font-size:clamp(1.9rem,3.4vw,2.9rem);
+  letter-spacing:-.045em;line-height:1;font-variant-numeric:tabular-nums;
+}
+.stat span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-mute);line-height:1.5}
+
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:clamp(28px,4vw,44px)}
+.tag{
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:999px;padding:.7em 1.15em;color:var(--fg-dim);
+}
+
+/* ===== marquee ===== */
+.strip{border-block:1px solid var(--line);background:var(--ink-2);padding-block:22px;margin-top:clamp(48px,7vw,88px)}
+.strip-label{text-align:center;margin-bottom:18px}
+.track{display:flex;gap:56px;width:max-content;animation:slide 34s linear infinite}
+.track span{
+  font-family:var(--display);font-weight:300;font-size:clamp(.95rem,1.7vw,1.3rem);
+  letter-spacing:-.02em;color:#4E505E;white-space:nowrap;
+  display:flex;align-items:center;gap:56px;
+}
+.track span::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--amber-deep)}
+@keyframes slide{to{transform:translateX(-50%)}}
+.strip-mask{overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+
+/* ===== sections ===== */
+.sec{padding-block:clamp(72px,11vw,150px)}
+.sec-head{display:flex;flex-direction:column;gap:20px;margin-bottom:clamp(40px,6vw,72px)}
+
+/* manifesto */
+.manifesto{
+  font-family:var(--display);font-weight:300;
+  font-size:clamp(1.55rem,4.4vw,3.6rem);line-height:1.06;letter-spacing:-.035em;
+  margin:0;max-width:24ch;text-wrap:balance;
+}
+.manifesto-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:clamp(32px,5vw,72px);align-items:center}
+.bust{width:100%;max-width:340px;height:auto;display:block;margin-inline:auto}
+
+/* offer list */
+.offer{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(32px,5vw,72px)}
+.offer-item{padding-block:26px;border-top:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:18px}
+.offer-item .num{font-family:var(--mono);font-size:11px;color:var(--amber);letter-spacing:.1em;padding-top:5px}
+.offer-item p{margin:6px 0 0;color:var(--fg-dim);font-size:14.5px;line-height:1.55}
+
+/* process — a real ordered sequence */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.step{background:var(--ink-2);padding:clamp(22px,2.6vw,32px);display:flex;flex-direction:column;gap:14px;min-width:0}
+.step-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.step-n{font-family:var(--display);font-weight:300;font-size:2.4rem;line-height:1;letter-spacing:-.05em;color:#2A2D3B;font-variant-numeric:tabular-nums}
+.step:first-child .step-n{color:var(--amber)}
+.step-t{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-mute);white-space:nowrap}
+.step p{margin:0;color:var(--fg-dim);font-size:14.5px;line-height:1.6}
+
+/* pricing */
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.plan{
+  background:var(--panel);border:1px solid var(--line);
+  padding:clamp(24px,2.6vw,34px);display:flex;flex-direction:column;gap:24px;min-width:0;
+  transition:border-color .3s ease,transform .3s ease;
+}
+.plan:hover{border-color:var(--line-hi);transform:translateY(-3px)}
+.plan-hot{
+  background:linear-gradient(175deg,#1B1520,var(--panel-2) 42%);
+  border-color:rgba(255,106,26,.42);
+  box-shadow:0 0 0 1px rgba(255,106,26,.08),0 30px 80px -40px rgba(255,106,26,.5);
+}
+.plan-hot:hover{border-color:var(--amber)}
+.plan-name{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.plan-name h3{font-family:var(--display);font-weight:400;font-size:1.05rem;letter-spacing:.02em;margin:0;text-transform:uppercase}
+.badge{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  background:var(--amber);color:#190800;padding:.45em .7em;border-radius:3px;font-weight:500;white-space:nowrap;
+}
+.price{display:flex;align-items:baseline;gap:.4em;flex-wrap:wrap}
+.price b{
+  font-family:var(--display);font-weight:200;font-size:clamp(2.6rem,4.6vw,3.6rem);
+  letter-spacing:-.05em;line-height:.95;font-variant-numeric:tabular-nums;
+}
+.price i{font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-mute)}
+.plan-for{margin:0;color:var(--fg-dim);font-size:14px;line-height:1.55}
+.plan ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px;flex:1}
+.plan li{position:relative;padding-left:20px;font-size:14.5px;line-height:1.5;color:var(--fg)}
+.plan li::before{content:"";position:absolute;left:0;top:.6em;width:7px;height:1px;background:var(--amber)}
+.plan li small{display:block;color:var(--fg-mute);font-size:12.5px;line-height:1.45;margin-top:2px}
+.plan .btn{justify-content:center;width:100%}
+.plan-foot{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-mute);text-align:center;margin:0}
+
+/* addons table */
+.rates{border:1px solid var(--line);background:var(--ink-2)}
+.rate{
+  display:grid;grid-template-columns:1fr auto;gap:16px;align-items:baseline;
+  padding:18px clamp(18px,2.4vw,28px);border-bottom:1px solid var(--line);
+}
+.rate:last-child{border-bottom:0}
+.rate div{min-width:0}
+.rate strong{font-weight:500;font-size:15px}
+.rate p{margin:3px 0 0;color:var(--fg-mute);font-size:13px;line-height:1.5}
+.rate b{font-family:var(--mono);font-size:15px;color:var(--amber-hi);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* compare */
+.compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.cmp{border:1px solid var(--line);padding:clamp(22px,2.6vw,32px);display:flex;flex-direction:column;gap:18px;background:var(--ink-2)}
+.cmp-b{background:linear-gradient(160deg,#151018,var(--ink-2) 55%);border-color:var(--line-hi)}
+.cmp h4{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--fg-mute);margin:0}
+.cmp-b h4{color:var(--amber)}
+.cmp dl{margin:0;display:flex;flex-direction:column;gap:14px}
+.cmp dt{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-mute)}
+.cmp dd{
+  margin:2px 0 0;font-family:var(--display);font-weight:300;font-size:clamp(1.15rem,2.1vw,1.6rem);
+  letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums;
+}
+.cmp-a dd{color:#6F7180}
+
+/* faq */
+.faq{border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{
+  cursor:pointer;list-style:none;padding:24px 48px 24px 0;position:relative;
+  font-family:var(--display);font-weight:400;font-size:clamp(1rem,1.7vw,1.18rem);
+  letter-spacing:-.02em;line-height:1.3;
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{
+  content:"+";position:absolute;right:8px;top:22px;font-family:var(--mono);
+  font-size:20px;color:var(--amber);transition:transform .25s ease;
+}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq p{margin:0 0 26px;color:var(--fg-dim);max-width:70ch;font-size:15px}
+
+/* final cta */
+.cta{
+  position:relative;border:1px solid var(--line-hi);
+  background:radial-gradient(70% 120% at 50% 0%,rgba(255,106,26,.13),var(--ink-2) 62%);
+  padding:clamp(40px,6vw,88px) clamp(24px,4vw,64px);text-align:center;overflow:hidden;
+}
+.cta .h2{margin-inline:auto;max-width:22ch}
+.cta .lede{margin-inline:auto;text-align:center}
+.cta-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:34px}
+
+/* footer */
+.foot{border-top:1px solid var(--line);padding-block:40px 56px;margin-top:clamp(64px,9vw,120px)}
+.foot-in{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
+.foot p{margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-mute)}
+.foot nav{display:flex;flex-wrap:wrap;gap:22px;font-size:14px;color:var(--fg-dim)}
+.foot nav a:hover{color:var(--amber-hi)}
+
+/* entrance — resting state is visible */
+.rise{animation:rise .9s cubic-bezier(.16,1,.3,1) both}
+.rise-2{animation-delay:.08s}
+.rise-3{animation-delay:.16s}
+.rise-4{animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+
+/* ===== responsive ===== */
+@media (max-width:1040px){
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .plans{grid-template-columns:1fr}
+  .plan-hot{order:-1}
+  .hero-body{grid-template-columns:1fr}
+  .manifesto-grid{grid-template-columns:1fr}
+  .bust{max-width:250px}
+}
+@media (max-width:720px){
+  .nav-links{display:none}
+  .nav .btn{margin-inline-start:auto}
+  .offer{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+  .compare{grid-template-columns:1fr}
+  .title .lo{padding-left:0}
+  .manifesto{max-width:none}
+}
+</style>
+
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="logo" href="#top">double take<i></i></a>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#price">Plans</a>
+      <a href="#rates">One-off</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn-solid" href="#price">Book a set</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="wrap hero-in">
+      <div class="slate rise">
+        <span class="rec">Recording</span>
+        <span>9:16 · 4K · 60 sec</span>
+        <span>Digital twin studio</span>
+        <span>since 2023</span>
+      </div>
+
+      <h1 class="title rise rise-2">
+        <span class="title-row">we shoot<span class="echo" aria-hidden="true">we shoot</span></span>
+        <span class="title-row lo">without you<span class="echo" aria-hidden="true">without you</span></span>
+      </h1>
+
+      <div class="hero-body">
+        <div class="hero-copy rise rise-3">
+          <p class="lede">A digital twin that speaks in your voice, looks into the camera and ships Reels every day. You show up once — 40 minutes on set. After that it works without you.</p>
+          <div class="hero-actions">
+            <a class="btn btn-amber" href="#price">See the plans</a>
+            <a class="play" href="#how">
+              <s aria-hidden="true">▶</s>
+              How a twin gets built
+            </a>
+          </div>
+        </div>
+
+        <div class="stats rise rise-4">
+          <div class="stat"><b>40</b><span>minutes on set<br>once</span></div>
+          <div class="stat"><b>48</b><span>hours<br>to a finished cut</span></div>
+          <div class="stat"><b>90</b><span>videos a month<br>on premiere</span></div>
+        </div>
+      </div>
+
+      <div class="tags rise rise-4">
+        <span class="tag">Avatar</span>
+        <span class="tag">Voice clone</span>
+        <span class="tag">Lip-sync in 8 languages</span>
+        <span class="tag">Content plan</span>
+        <span class="tag">Editing &amp; posting</span>
+      </div>
+    </div>
+
+    <div class="strip">
+      <p class="eyebrow strip-label">Built on · <b>subscriptions on us</b></p>
+      <div class="strip-mask">
+        <div class="track" aria-hidden="true">
+          <span>HeyGen</span><span>ElevenLabs</span><span>Runway Gen-4</span><span>Kling 2.5</span><span>Veo 3</span><span>Midjourney</span><span>Descript</span><span>CapCut Pro</span>
+          <span>HeyGen</span><span>ElevenLabs</span><span>Runway Gen-4</span><span>Kling 2.5</span><span>Veo 3</span><span>Midjourney</span><span>Descript</span><span>CapCut Pro</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MANIFESTO ============ -->
+  <section class="sec">
+    <div class="wrap manifesto-grid">
+      <div>
+        <p class="eyebrow" style="margin-bottom:26px">The idea</p>
+        <p class="manifesto">Your face stops being the bottleneck. <span class="dim">Content keeps shipping while you're on holiday, in a meeting, or just not camera-ready.</span></p>
+        <p class="lede" style="margin-top:32px">Personal brands don't break on ideas. They break on shoot days: lighting, tripod, re-takes, "not today". The twin takes all of that off you. You approve the script on your phone and the video goes out.</p>
+      </div>
+      <svg class="bust" viewBox="0 0 300 250" role="img" aria-label="A silhouette of a person beside their digital twin">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#1B1D29"/>
+            <stop offset="1" stop-color="#0C0D13"/>
+          </linearGradient>
+        </defs>
+        <g stroke="#242733" stroke-width="1.2" fill="none">
+          <circle cx="175" cy="86" r="42"/>
+          <path d="M105 246 C107 190 137 164 175 164 C213 164 243 190 245 246"/>
+        </g>
+        <g fill="url(#g1)" stroke="#33364A" stroke-width="1.4">
+          <circle cx="120" cy="86" r="42"/>
+          <path d="M50 246 C52 190 82 164 120 164 C158 164 188 190 190 246 Z"/>
+        </g>
+        <g stroke="#FF6A1A" stroke-width="2" fill="none" stroke-linecap="round">
+          <path d="M84 62 A42 42 0 0 0 82 104" opacity=".9"/>
+          <path d="M56 236 C58 196 70 176 88 168" opacity=".55"/>
+        </g>
+        <circle cx="137" cy="82" r="2.6" fill="#FFB25C"/>
+        <circle cx="103" cy="82" r="2.6" fill="#FFB25C"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============ OFFER ============ -->
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">What the work covers</p>
+        <h2 class="h2">We don't sell access to a model. <span class="dim">We run the production.</span></h2>
+      </div>
+      <div class="offer">
+        <div class="offer-item">
+          <span class="num">01</span>
+          <div>
+            <h3 class="h3">A content plan, not a topic list</h3>
+            <p>We work through your product, audience and objections, then hand over a rubric, hooks for the first three seconds and a dated publishing calendar.</p>
+          </div>
+        </div>
+        <div class="offer-item">
+          <span class="num">02</span>
+          <div>
+            <h3 class="h3">An avatar with your own face</h3>
+            <p>One set: lighting, backdrop, wardrobe. We build the twin in HeyGen and clean up the gestures, pauses and eye contact until it reads as you.</p>
+          </div>
+        </div>
+        <div class="offer-item">
+          <span class="num">03</span>
+          <div>
+            <h3 class="h3">A voice clone</h3>
+            <p>Fifteen minutes of clean speech and the voice is yours: intonation, pace, the words you actually use. English in the base, a second language on request.</p>
+          </div>
+        </div>
+        <div class="offer-item">
+          <span class="num">04</span>
+          <div>
+            <h3 class="h3">Scripts written per format</h3>
+            <p>Reels, Shorts and TikTok get written separately. Two openings per video, and we keep the one that holds retention.</p>
+          </div>
+        </div>
+        <div class="offer-item">
+          <span class="num">05</span>
+          <div>
+            <h3 class="h3">Editing and packaging</h3>
+            <p>Tight cut, captions, sound, thumbnails, 9:16 vertical frame. Files arrive ready to publish, no round trip through your editor.</p>
+          </div>
+        </div>
+        <div class="offer-item">
+          <span class="num">06</span>
+          <div>
+            <h3 class="h3">Tool subscriptions on us</h3>
+            <p>HeyGen, ElevenLabs, background generation, upscaling. No seat licences to manage, no credit top-ups, no five invoices to reconcile.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROCESS ============ -->
+  <section class="sec" id="how" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Production cycle · <b>first video in 7 days</b></p>
+        <h2 class="h2">Four steps. <span class="dim">Your time goes into the second one.</span></h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-top"><span class="step-n">01</span><span class="step-t">Day 1</span></div>
+          <h3 class="h3">Briefing</h3>
+          <p>One hour on a call: goals, product, tone of voice. You leave with a 30-day content plan and a shot list of looks.</p>
+        </div>
+        <div class="step">
+          <div class="step-top"><span class="step-n">02</span><span class="step-t">40 minutes</span></div>
+          <h3 class="h3">The set</h3>
+          <p>We record four minutes of video and fifteen minutes of speech. At our studio, or at yours — we ship the lights and a framing guide.</p>
+        </div>
+        <div class="step">
+          <div class="step-top"><span class="step-n">03</span><span class="step-t">Days 2–5</span></div>
+          <h3 class="h3">Building the twin</h3>
+          <p>We train the avatar and the voice, then check expressions frame by frame. You see a test take and we revise until it's you.</p>
+        </div>
+        <div class="step">
+          <div class="step-top"><span class="step-n">04</span><span class="step-t">Every week</span></div>
+          <h3 class="h3">The flow</h3>
+          <p>Script → take → edit → your "ship it" → publish. From here on you only approve.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============ -->
+  <section class="sec" id="price" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Plans · billed monthly · <b>tool subscriptions included</b></p>
+        <h2 class="h2">Three shooting modes.</h2>
+        <p class="lede">Building the twin is included in your first month — there is no separate setup fee. After that you are paying for the flow of videos.</p>
+      </div>
+
+      <div class="plans">
+        <article class="plan">
+          <div class="plan-name"><h3>Take</h3></div>
+          <div class="price"><b>$300</b><i>/ month</i></div>
+          <p class="plan-for">Proving the idea. Founders and small teams that just need to start showing up on video.</p>
+          <ul>
+            <li>1 digital avatar<small>One look: backdrop, lighting, wardrobe</small></li>
+            <li>Voice clone<small>English plus one more language</small></li>
+            <li>8 vertical videos a month<small>Up to 60 seconds, 9:16</small></li>
+            <li>30-day content plan<small>30 topics with the hooks written</small></li>
+            <li>Editing, captions, thumbnails</li>
+            <li>HeyGen subscription on us</li>
+            <li>One revision round per video</li>
+            <li>Turnaround: avatar in 5 days, video in 48 hours</li>
+          </ul>
+          <a class="btn" href="#cta">Start with a take</a>
+          <p class="plan-foot">Twin build included</p>
+        </article>
+
+        <article class="plan plan-hot">
+          <div class="plan-name"><h3>Scene</h3><span class="badge">Most picked</span></div>
+          <div class="price"><b>$1,000</b><i>/ month</i></div>
+          <p class="plan-for">The workhorse. For anyone running a personal brand or warming a funnel who needs a steady flow.</p>
+          <ul>
+            <li>3 avatars<small>Different looks and locations per rubric</small></li>
+            <li>Voice with emotional presets<small>Calm, high-energy, confiding</small></li>
+            <li>30 videos a month<small>Reels, Shorts, TikTok — each cut for its platform</small></li>
+            <li>Quarterly strategy and rubric</li>
+            <li>A/B tests on the first 3 seconds<small>Two openings per video, we keep the winner</small></li>
+            <li>Lip-sync translation into 3 languages</li>
+            <li>HeyGen, ElevenLabs, Midjourney — on us</li>
+            <li>A producer on Telegram, replies within 2 hours</li>
+            <li>Dashboard: reach, retention, inbound</li>
+          </ul>
+          <a class="btn btn-amber" href="#cta">Start the flow</a>
+          <p class="plan-foot">First video on day 7</p>
+        </article>
+
+        <article class="plan">
+          <div class="plan-name"><h3>Premiere</h3></div>
+          <div class="price"><b>$2,500</b><i>/ month</i></div>
+          <p class="plan-for">Full production, handled. For brands, agencies and anyone whose main sales channel is video.</p>
+          <ul>
+            <li>Unlimited looks<small>4K studio shoot, re-shoots on request</small></li>
+            <li>90 videos a month<small>Reels, landing-page video, email, evergreen webinar</small></li>
+            <li>A producer and scriptwriter of your own<small>One named person on your account</small></li>
+            <li>The whole cycle: plan → take → edit → publish</li>
+            <li>Lip-sync in 8 languages, localised per market</li>
+            <li>Your twin inside the funnel<small>Greetings by name, support replies, webinars</small></li>
+            <li>Licensed actor avatars for UGC</li>
+            <li>24-hour SLA, overnight urgent takes</li>
+            <li>All rights and source files handed over</li>
+          </ul>
+          <a class="btn" href="#cta">Talk about Premiere</a>
+          <p class="plan-foot">Four projects a month</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RATES ============ -->
+  <section class="sec" id="rates" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">One-off work</p>
+        <h2 class="h2">No subscription.</h2>
+      </div>
+      <div class="rates">
+        <div class="rate">
+          <div><strong>Avatar, done for you</strong><p>Shoot, build, test take. We hand over the login and you shoot yourself.</p></div>
+          <b>$600</b>
+        </div>
+        <div class="rate">
+          <div><strong>Voice clone</strong><p>Fifteen minutes of recording, noise cleanup, two emotional presets.</p></div>
+          <b>$150</b>
+        </div>
+        <div class="rate">
+          <div><strong>A single video</strong><p>Script, take, edit, captions. Up to 60 seconds.</p></div>
+          <b>$80</b>
+        </div>
+        <div class="rate">
+          <div><strong>Lip-sync translation</strong><p>Per language, per video. Lips match the new track.</p></div>
+          <b>$45</b>
+        </div>
+        <div class="rate">
+          <div><strong>30-day content plan</strong><p>Rubric, topics, hooks, calendar. No production.</p></div>
+          <b>$250</b>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMPARE ============ -->
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">The arithmetic</p>
+        <h2 class="h2">A shoot day versus <span class="dim">one set.</span></h2>
+      </div>
+      <div class="compare">
+        <div class="cmp cmp-a">
+          <h4>The usual way</h4>
+          <dl>
+            <dt>Your time</dt><dd>8 hours a month</dd>
+            <dt>Videos shipped</dt><dd>4–6</dd>
+            <dt>Changing looks</dt><dd>another shoot</dd>
+            <dt>A day falls through</dt><dd>a month with no content</dd>
+          </dl>
+        </div>
+        <div class="cmp cmp-b">
+          <h4>With a twin · Scene plan</h4>
+          <dl>
+            <dt>Your time</dt><dd>40 minutes, once</dd>
+            <dt>Videos shipped</dt><dd>30 a month</dd>
+            <dt>Changing looks</dt><dd>pick one of three</dd>
+            <dt>A day falls through</dt><dd>publishing continues</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="sec" id="faq" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">FAQ</p>
+        <h2 class="h2">What people ask first.</h2>
+      </div>
+      <div class="faq">
+        <details open>
+          <summary>Can people tell it isn't me?</summary>
+          <p>On vertical video under 60 seconds, effectively no. We separately clean up eye contact, pauses and hand gestures — that is where the eye catches a fake. Before launch you get a test take and you either say "that's me" or we rebuild it; revisions aren't capped at that stage.</p>
+        </details>
+        <details>
+          <summary>How much footage do you need from me?</summary>
+          <p>Four minutes of video and fifteen minutes of speech. That fits into 40 minutes including the lighting setup. Shoot at our studio, or at yours — in that case we ship lights, a lav mic and a framing guide.</p>
+        </details>
+        <details>
+          <summary>Who owns the avatar and the voice?</summary>
+          <p>You do. We sign a likeness and voice release plus a contract that leaves the twin and every deliverable with you. On Premiere we hand over the source files and models at the end. If you leave, the twin is deleted from our accounts on your request.</p>
+        </details>
+        <details>
+          <summary>What if I need to say something urgently?</summary>
+          <p>Standard turnaround is 48 hours from approved copy. Scene and Premiere include urgent takes: send the text, get the finished video back in 24 hours — overnight on Premiere.</p>
+        </details>
+        <details>
+          <summary>How does paying for all the AI tools work?</summary>
+          <p>Every subscription — HeyGen, ElevenLabs, background generation — sits on our accounts and is inside the plan. You get one invoice a month, on contract, with proper paperwork. No card details in five dashboards and no credit running out mid-month.</p>
+        </details>
+        <details>
+          <summary>What if the content doesn't land?</summary>
+          <p>We treat month one as a test: we watch three-second retention and completion rate, then swap hooks and rubrics. If you stop after the first month the twin stays with you, with nothing more to pay for it.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="wrap" id="cta" style="padding-bottom:clamp(24px,4vw,48px)">
+    <div class="cta">
+      <p class="eyebrow" style="margin-bottom:24px">Slots open for October: <b>4</b></p>
+      <h2 class="h2">Shoot one set — <span class="dim">then forget the camera.</span></h2>
+      <p class="lede" style="margin-top:24px">Send a link to your profile. We'll come back with the rubrics that suit you and show you a twin from a comparable project — before you pay anything.</p>
+      <div class="cta-actions">
+        <a class="btn btn-amber" href="https://t.me/">Message us on Telegram</a>
+        <a class="btn" href="mailto:hi@doubletake.studio">hi@doubletake.studio</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <a class="logo" href="#top">double take<i></i></a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#price">Plans</a>
+      <a href="#rates">One-off</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <p>Digital twin studio · 2026</p>
+  </div>
+</footer>

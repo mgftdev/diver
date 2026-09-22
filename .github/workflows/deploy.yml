@@ -1,0 +1,60 @@
+# Builds the static site and publishes it to GitHub Pages on every push to main.
+#
+# One-time setup in the repository: Settings → Pages → Source: "GitHub Actions".
+# The Express server (lead API, admin inbox) is not part of this deploy — Pages only
+# serves static files. See scripts/build-static.mjs for what changes on the copy.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a newer push waits rather than cancelling a live publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Tailwind: src/styles/tailwind.css → public/assets/css/site.css
+      - run: npm run build
+
+      # Gives the base path the site is served under ("/diver" for this repo).
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - run: npm run build:static
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

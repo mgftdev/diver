@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en" class="bg-ink">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Double Take Studio — digital twins for video</title>
+<meta name="description" content="We build a digital twin that speaks in your voice and ships Reels every day. You show up once for 40 minutes on set. Plans from $300 a month.">
+<meta name="theme-color" content="#08080B">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Double Take Studio — digital twins for video">
+<meta property="og:description" content="Shoot one set, then forget the camera. Digital avatar, voice clone, content plan and editing — from $300 a month.">
+<meta property="og:image" content="/assets/img/robot.png">
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200..800&family=Golos+Text:wght@400..700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script type="module" src="/assets/js/main.js"></script>
+</head>
+<body>
+
+<!-- ============================== NAV ============================== -->
+<header class="sticky top-0 z-50 border-b border-edge bg-ink/80 backdrop-blur-lg">
+  <div class="shell flex items-center gap-3 py-3.5 md:gap-6">
+    <a href="#top" class="flex items-baseline gap-1.5 font-display text-[17px] font-medium tracking-[-0.05em] whitespace-nowrap md:text-[19px]">
+      double take
+      <span class="inline-block size-1.5 rounded-full bg-flare shadow-[0_0_12px_#ff6a1a]"></span>
+    </a>
+
+    <nav class="mx-auto hidden gap-7 text-sm text-mist md:flex" aria-label="Sections">
+      <a href="#how" class="py-1 transition-colors hover:text-chalk">How it works</a>
+      <a href="#plans" class="py-1 transition-colors hover:text-chalk">Plans</a>
+      <a href="#rates" class="py-1 transition-colors hover:text-chalk">One-off</a>
+      <a href="#faq" class="py-1 transition-colors hover:text-chalk">FAQ</a>
+    </nav>
+
+    <span class="nav-timecode hidden xl:flex" aria-hidden="true"><span data-tc-scene>SC 00</span><span class="text-edge-hi">/</span><span data-tc-time>00:00:00:00</span></span>
+
+    <a href="#book" class="btn btn-solid ml-auto px-4 py-[0.8em] text-[10.5px] whitespace-nowrap md:ml-0 md:px-6 md:py-[0.85em] md:text-xs">Book a set</a>
+
+    <button type="button" id="nav-toggle" class="ml-1 grid size-11 place-items-center border border-edge md:hidden"
+            aria-expanded="false" aria-controls="nav-drawer" aria-label="Open menu">
+      <span class="relative block h-2.5 w-4 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-chalk before:content-[''] after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-chalk after:content-['']"></span>
+    </button>
+  </div>
+
+  <div id="nav-drawer" hidden class="border-t border-edge bg-ink md:hidden">
+    <nav class="shell flex flex-col py-2" aria-label="Sections">
+      <a href="#how" class="border-b border-edge py-3.5 text-sm text-mist">How it works</a>
+      <a href="#plans" class="border-b border-edge py-3.5 text-sm text-mist">Plans</a>
+      <a href="#rates" class="border-b border-edge py-3.5 text-sm text-mist">One-off</a>
+      <a href="#faq" class="py-3.5 text-sm text-mist">FAQ</a>
+    </nav>
+  </div>
+  <span class="nav-progress" data-progress aria-hidden="true"></span>
+</header>
+
+<main id="top">
+
+  <!-- ============================== HERO ============================== -->
+  <!-- `isolate` here (not on the h1) keeps the glow, the light streak, the robot
+       and the second headline line in ONE stacking context, so the render's
+       black can screen-blend into the glow instead of sitting in a box. -->
+  <!-- No bottom padding: the tool band must be the hero's last pixel. Any padding
+       below it is still inside the hero, and the diver — which the scroll pin
+       carries downwards — would show through there as a stray sliver. -->
+  <section class="relative isolate overflow-hidden pt-[clamp(48px,8vw,96px)] pb-0">
+    <div class="pointer-events-none absolute inset-x-[-10%] top-[-20%] -z-30 h-[120%] bg-[radial-gradient(52%_46%_at_50%_34%,rgba(255,106,26,0.16),transparent_70%)]"></div>
+    <div class="pointer-events-none absolute top-0 left-1/2 -z-20 h-[62%] w-px bg-linear-to-b from-transparent via-flare to-transparent opacity-50"></div>
+
+    <div class="shell relative">
+      <!-- Clapperboard slate: the studio's own vernacular -->
+      <div class="mb-[clamp(24px,5vw,52px)] flex animate-rise flex-wrap items-center gap-x-6 gap-y-2.5">
+        <span class="eyebrow flex items-center gap-2 text-flare">
+          <span class="size-[7px] animate-rec rounded-full bg-flare"></span>
+          Recording
+        </span>
+        <span class="eyebrow">9:16 · 4K · 60 sec</span>
+        <span class="eyebrow">Digital twin studio</span>
+        <span class="eyebrow">since 2023</span>
+      </div>
+
+      <div class="pb-[clamp(28px,7vw,88px)]">
+        <h1 class="display-xl relative">
+          <!-- The render is black-on-black: screen blending drops its background
+               entirely, so no letterbox edge shows over the hero glow. -->
+          <!-- The diver is the centrepiece, so its height tracks the viewport rather
+               than the headline — shrinking the type must not shrink the figure.
+               Dimmed and slightly out of focus to sit back in the scene; both
+               headline lines are painted after it, so the type passes in front.
+
+               Anchoring: `-translate-y-[2%]` is a percentage of the box's OWN
+               height, and 2% is where the helmet crown sits in the LAST frame (it
+               sits at 5% in the first — the head lifts as it turns). So the clamped
+               `top` puts the crown just under the nav bar at the end of the turn and
+               a little lower at rest; anchoring to the first frame instead would
+               push the finished turn up behind the nav.
+
+               Head turn: a 61-frame sequence (seq/f000–f060.webp, every second frame
+               of a 24fps image-to-video clip) drawn onto the canvas by
+               modules/diver.js as the page scrolls. The <img> is the resting frame
+               for no-JS and reduced motion, and what shows until the canvas has
+               drawn. Blend, blur and mask sit on this box, never on its children, so
+               everything inside composites as one image.
+
+               The clip was generated from start/end stills whose torsos were first
+               registered onto each other, so the body holds still across frames
+               with no per-frame correction. -->
+          <div data-diver data-frames="/assets/img/diver/seq/f{n}.webp" data-frame-count="61" aria-hidden="true"
+               class="pointer-events-none absolute top-[clamp(-10.2rem,-8vw,-3.5rem)] left-1/2 -z-10 aspect-[876/1052] h-[clamp(340px,46.5vw,1050px)] -translate-x-1/2 -translate-y-[2%] blur-[1px] brightness-[0.72] mix-blend-screen mask-robot">
+            <img class="diver-layer object-contain" src="/assets/img/diver/seq/f000.webp"
+                 alt="" width="876" height="1052" fetchpriority="high" decoding="async">
+            <canvas class="diver-layer diver-canvas" width="876" height="1052"></canvas>
+          </div>
+          <span class="relative block">we shoot</span>
+          <span class="relative block font-light text-shadow-text">without you</span>
+        </h1>
+      </div>
+
+      <div class="grid animate-rise items-end gap-[clamp(24px,4vw,56px)] lg:grid-cols-[1fr_auto]">
+        <div class="flex max-w-[46ch] flex-col gap-6">
+          <p class="lede">
+            A digital twin that speaks in your voice, looks into the camera and ships Reels every day.
+            You show up once — 40 minutes on set. After that it works without you.
+          </p>
+          <div class="flex flex-wrap items-center gap-3">
+            <a href="#plans" class="btn btn-flare">See the plans</a>
+            <a href="#how" class="group flex items-center gap-2.5 px-2 py-[1.15em] font-mono text-xs tracking-[0.14em] text-mist uppercase transition-colors hover:text-chalk">
+              <span class="grid size-[34px] place-items-center rounded-full border border-edge-hi transition-colors group-hover:border-flare"><svg viewBox="0 0 10 12" class="ml-0.5 size-2.5 fill-current" aria-hidden="true"><path d="M0 0l10 6-10 6z"/></svg></span>
+              How a twin gets built
+            </a>
+          </div>
+        </div>
+
+        <!-- Translucent cells, and hairlines drawn with divide-* rather than a
+             filled parent, so the robot behind them stays visible. -->
+        <dl class="grid grid-cols-1 divide-y divide-edge border border-edge sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <div class="stat-cell">
+            <dd class="order-1 font-display text-[clamp(1.9rem,3.4vw,2.9rem)] leading-none font-light tracking-[-0.045em] tabular">40</dd>
+            <dt class="order-2 font-mono text-[10.5px] leading-[1.5] tracking-[0.14em] text-ash uppercase">minutes on set<br>once</dt>
+          </div>
+          <div class="stat-cell">
+            <dd class="order-1 font-display text-[clamp(1.9rem,3.4vw,2.9rem)] leading-none font-light tracking-[-0.045em] tabular">48</dd>
+            <dt class="order-2 font-mono text-[10.5px] leading-[1.5] tracking-[0.14em] text-ash uppercase">hours<br>to a finished cut</dt>
+          </div>
+          <div class="stat-cell">
+            <dd class="order-1 font-display text-[clamp(1.9rem,3.4vw,2.9rem)] leading-none font-light tracking-[-0.045em] tabular">90</dd>
+            <dt class="order-2 font-mono text-[10.5px] leading-[1.5] tracking-[0.14em] text-ash uppercase">videos a month<br>on premiere</dt>
+          </div>
+        </dl>
+      </div>
+
+      <div class="mt-[clamp(26px,4vw,44px)] flex flex-wrap items-center justify-between gap-5">
+      <ul class="flex animate-rise list-none flex-wrap gap-2 p-0">
+        <li class="chip">Avatar</li>
+        <li class="chip">Voice clone</li>
+        <li class="chip">Lip-sync in 8 languages</li>
+        <li class="chip">Content plan</li>
+        <li class="chip">Editing &amp; posting</li>
+      </ul>
+        <p class="scroll-cue animate-rise" aria-hidden="true"><span class="scroll-cue__line"></span>Scroll — he turns to look</p>
+      </div>
+    </div>
+
+    <!-- Tool marquee -->
+    <!-- Translucent, like the stat tiles: the diver passes behind the tool names
+         instead of being sliced off by an opaque band. -->
+    <div class="mt-[clamp(44px,7vw,88px)] border-y border-edge bg-ink-2/60 py-5 backdrop-blur-[2px]">
+      <p class="eyebrow mb-4 text-center">Built on · <b>subscriptions on us</b></p>
+      <div class="overflow-hidden mask-fade-x">
+        <div class="flex w-max animate-marquee gap-14" data-marquee aria-hidden="true">
+          <span class="marquee-item">HeyGen</span>
+          <span class="marquee-item">ElevenLabs</span>
+          <span class="marquee-item">Runway Gen-4</span>
+          <span class="marquee-item">Kling 2.5</span>
+          <span class="marquee-item">Veo 3</span>
+          <span class="marquee-item">Midjourney</span>
+          <span class="marquee-item">Descript</span>
+          <span class="marquee-item">CapCut Pro</span>
+          <span class="marquee-item">HeyGen</span>
+          <span class="marquee-item">ElevenLabs</span>
+          <span class="marquee-item">Runway Gen-4</span>
+          <span class="marquee-item">Kling 2.5</span>
+          <span class="marquee-item">Veo 3</span>
+          <span class="marquee-item">Midjourney</span>
+          <span class="marquee-item">Descript</span>
+          <span class="marquee-item">CapCut Pro</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================== SCENE 01 · THE PROBLEM ======================== -->
+  <div class="scene scene--1" data-scene="01">
+    <!-- Dotted wave surface (three.js), lazy-loaded when this scene nears the viewport. -->
+    <div class="dotted-surface" data-dotted-surface data-size="8" data-opacity="0.45" aria-hidden="true"><div class="dotted-surface__layer"></div></div>
+    <div class="shell"><div class="scene-slate" data-reveal><span class="scene-slate__no">Scene 01</span><span class="scene-slate__rule"></span><span class="scene-slate__title">The problem</span></div></div>
+  <!-- ============================== IDEA ============================== -->
+  <section class="pb-[clamp(64px,10vw,140px)]" data-reveal>
+    <div class="shell grid items-center gap-[clamp(32px,5vw,72px)] lg:grid-cols-[1.25fr_0.75fr]">
+      <div>
+        <p class="eyebrow mb-6">The idea</p>
+        <p class="font-display text-[clamp(1.55rem,4.4vw,3.6rem)] leading-[1.06] font-light tracking-[-0.035em] text-balance lg:max-w-[24ch]">
+          Your face stops being the bottleneck.
+          <span class="text-shadow-text">Content keeps shipping while you're on holiday, in a meeting, or just not camera-ready.</span>
+        </p>
+        <p class="lede mt-8">
+          Personal brands don't break on ideas. They break on shoot days: lighting, tripod, re-takes,
+          "not today". The twin takes all of that off you. You approve the script on your phone and
+          the video goes out.
+        </p>
+      </div>
+
+      <svg viewBox="0 0 300 250" role="img" aria-label="A silhouette of a person beside their digital twin"
+           class="mx-auto block w-full max-w-[250px] lg:max-w-[340px]">
+        <defs>
+          <linearGradient id="bust" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#1B1D29"/>
+            <stop offset="1" stop-color="#0C0D13"/>
+          </linearGradient>
+        </defs>
+        <g stroke="#242733" stroke-width="1.2" fill="none">
+          <circle cx="175" cy="86" r="42"/>
+          <path d="M105 246 C107 190 137 164 175 164 C213 164 243 190 245 246"/>
+        </g>
+        <g fill="url(#bust)" stroke="#33364A" stroke-width="1.4">
+          <circle cx="120" cy="86" r="42"/>
+          <path d="M50 246 C52 190 82 164 120 164 C158 164 188 190 190 246 Z"/>
+        </g>
+        <g stroke="#FF6A1A" stroke-width="2" fill="none" stroke-linecap="round">
+          <path d="M84 62 A42 42 0 0 0 82 104" opacity=".9"/>
+          <path d="M56 236 C58 196 70 176 88 168" opacity=".55"/>
+        </g>
+        <circle cx="137" cy="82" r="2.6" fill="#FFB25C"/>
+        <circle cx="103" cy="82" r="2.6" fill="#FFB25C"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============================== ARITHMETIC ============================== -->
+  <!-- Moved up into Scene 01: it states the problem the rest of the page solves.
+       One table instead of two cards, so each "before" sits beside its "after". -->
+  <section class="pb-[clamp(56px,8vw,104px)]">
+    <div class="shell">
+      <div class="mb-[clamp(36px,6vw,68px)] flex flex-col gap-5" data-reveal>
+        <p class="eyebrow">The arithmetic</p>
+        <h2 class="display-lg">A shoot day versus <span class="text-shadow-text">one set.</span></h2>
+      </div>
+      <div class="overflow-x-auto" data-reveal>
+        <table class="versus">
+          <thead>
+            <tr><td></td><th scope="col">The usual way</th><th scope="col" class="versus__win">With a twin · Scene plan</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Your time</th><td class="versus__before" data-label="Usual"><span class="versus__value">8 hours a month</span></td><td class="versus__win" data-label="With a twin">40 minutes, once</td></tr>
+            <tr><th scope="row">Videos shipped</th><td class="versus__before" data-label="Usual"><span class="versus__value">4–6</span></td><td class="versus__win" data-label="With a twin">30 a month</td></tr>
+            <tr><th scope="row">Changing looks</th><td class="versus__before" data-label="Usual"><span class="versus__value">another shoot</span></td><td class="versus__win" data-label="With a twin">pick one of three</td></tr>
+            <tr><th scope="row">A day falls through</th><td class="versus__before" data-label="Usual"><span class="versus__value">a month with no content</span></td><td class="versus__win" data-label="With a twin">publishing continues</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+      <div class="shell scene-next" data-reveal><a href="#book" class="btn">Book a set</a><span class="scene-next__hint">Next · Scene 02 — The process</span></div>
+  </div>
+
+  <!-- ======================== SCENE 02 · THE PROCESS ======================== -->
+  <div class="scene scene--2" data-scene="02">
+    <div class="shell"><div class="scene-slate" data-reveal><span class="scene-slate__no">Scene 02</span><span class="scene-slate__rule"></span><span class="scene-slate__title">The process</span></div></div>
+  <!-- ============================== PROCESS ============================== -->
+  <section id="how" class="scroll-mt-20 pb-[clamp(56px,8vw,104px)]">
+    <div class="shell">
+      <div class="mb-[clamp(36px,6vw,68px)] flex flex-col gap-5" data-reveal>
+        <p class="eyebrow">Production cycle · <b>first video in 7 days</b></p>
+        <h2 class="display-lg">Four steps. <span class="text-shadow-text">Your time goes into the second one.</span></h2>
+      </div>
+      <ol class="filmstrip" data-reveal>
+        <li class="filmstrip__frame">
+          <div class="filmstrip__meta"><span class="filmstrip__no">FR 01</span><span>Day 1</span></div>
+          <h3 class="display-sm">Briefing</h3>
+          <p>One hour on a call: goals, product, tone of voice. You leave with a 30-day content plan and a shot list of looks.</p>
+        </li>
+        <li class="filmstrip__frame filmstrip__frame--you">
+          <div class="filmstrip__meta"><span class="filmstrip__no">FR 02</span><span>40 minutes</span></div>
+          <h3 class="display-sm">The set</h3>
+          <p>We record four minutes of video and fifteen minutes of speech. At our studio, or at yours — we ship the lights and a framing guide.</p>
+          <span class="filmstrip__tag">Your part</span>
+        </li>
+        <li class="filmstrip__frame">
+          <div class="filmstrip__meta"><span class="filmstrip__no">FR 03</span><span>Days 2–5</span></div>
+          <h3 class="display-sm">Building the twin</h3>
+          <p>We train the avatar and the voice, then check expressions frame by frame. You see a test take and we revise until it's you.</p>
+        </li>
+        <li class="filmstrip__frame">
+          <div class="filmstrip__meta"><span class="filmstrip__no">FR 04</span><span>Every week</span></div>
+          <h3 class="display-sm">The flow</h3>
+          <p>Script → take → edit → your "ship it" → publish. From here on you only approve.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================== OFFER ============================== -->
+  <section class="pb-[clamp(64px,10vw,140px)]">
+    <div class="shell">
+      <div class="mb-[clamp(36px,6vw,68px)] flex flex-col gap-5" data-reveal>
+        <p class="eyebrow">What the work covers</p>
+        <h2 class="display-lg">We don't sell access to a model. <span class="text-shadow-text">We run the production.</span></h2>
+      </div>
+
+      <div class="grid gap-x-[clamp(32px,5vw,72px)] md:grid-cols-2" data-reveal>
+        <article class="grid grid-cols-[auto_1fr] gap-[18px] border-t border-edge py-6">
+          <span class="pt-1.5 font-mono text-[11px] tracking-[0.1em] text-flare">01</span>
+          <div>
+            <h3 class="display-sm">A content plan, not a topic list</h3>
+            <p class="mt-1.5 max-w-[52ch] text-[14.5px] leading-[1.55] text-mist">We work through your product, audience and objections, then hand over a rubric, hooks for the first three seconds and a dated publishing calendar.</p>
+          </div>
+        </article>
+        <article class="grid grid-cols-[auto_1fr] gap-[18px] border-t border-edge py-6">
+          <span class="pt-1.5 font-mono text-[11px] tracking-[0.1em] text-flare">02</span>
+          <div>
+            <h3 class="display-sm">An avatar with your own face</h3>
+            <p class="mt-1.5 max-w-[52ch] text-[14.5px] leading-[1.55] text-mist">One set: lighting, backdrop, wardrobe. We build the twin in HeyGen and clean up the gestures, pauses and eye contact until it reads as you.</p>
+          </div>
+        </article>
+        <article class="grid grid-cols-[auto_1fr] gap-[18px] border-t border-edge py-6">
+          <span class="pt-1.5 font-mono text-[11px] tracking-[0.1em] text-flare">03</span>
+          <div>
+            <h3 class="display-sm">A voice clone</h3>
+            <p class="mt-1.5 max-w-[52ch] text-[14.5px] leading-[1.55] text-mist">Fifteen minutes of clean speech and the voice is yours: intonation, pace, the words you actually use. English in the base, a second language on request.</p>
+          </div>
+        </article>
+        <article class="grid grid-cols-[auto_1fr] gap-[18px] border-t border-edge py-6">
+          <span class="pt-1.5 font-mono text-[11px] tracking-[0.1em] text-flare">04</span>
+          <div>
+            <h3 class="display-sm">Scripts written per format</h3>
+            <p class="mt-1.5 max-w-[52ch] text-[14.5px] leading-[1.55] text-mist">Reels, Shorts and TikTok get written separately. Two openings per video, and we keep the one that holds retention.</p>
+          </div>
+        </article>
+        <article class="grid grid-cols-[auto_1fr] gap-[18px] border-t border-edge py-6">
+          <span class="pt-1.5 font-mono text-[11px] tracking-[0.1em] text-flare">05</span>
+          <div>
+            <h3 class="display-sm">Editing and packaging</h3>
+            <p class="mt-1.5 max-w-[52ch] text-[14.5px] leading-[1.55] text-mist">Tight cut, captions, sound, thumbnails, 9:16 vertical frame. Files arrive ready to publish, no round trip through your editor.</p>
+          </div>
+        </article>
+        <article class="grid grid-cols-[auto_1fr] gap-[18px] border-t border-edge py-6">
+          <span class="pt-1.5 font-mono text-[11px] tracking-[0.1em] text-flare">06</span>
+          <div>
+            <h3 class="display-sm">Tool subscriptions on us</h3>
+            <p class="mt-1.5 max-w-[52ch] text-[14.5px] leading-[1.55] text-mist">HeyGen, ElevenLabs, background generation, upscaling. No seat licences to manage, no credit top-ups, no five invoices to reconcile.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+      <div class="shell scene-next" data-reveal><a href="#book" class="btn">Book a set</a><span class="scene-next__hint">Next · Scene 03 — The price</span></div>
+  </div>
+
+  <!-- ========================= SCENE 03 · THE PRICE ========================= -->
+  <div class="scene scene--3" data-scene="03" id="scene-price">
+    <div class="shell"><div class="scene-slate" data-reveal><span class="scene-slate__no">Scene 03</span><span class="scene-slate__rule"></span><span class="scene-slate__title">The price</span></div></div>
+  <!-- ============================== PLANS ============================== -->
+  <section id="plans" class="scroll-mt-20 pb-[clamp(64px,10vw,140px)]">
+    <div class="shell">
+      <div class="mb-[clamp(36px,6vw,68px)] flex flex-col gap-5" data-reveal>
+        <p class="eyebrow">Plans · billed monthly · <b>tool subscriptions included</b></p>
+        <h2 class="display-lg">Three shooting modes.</h2>
+        <p class="lede">Building the twin is included in your first month — there is no separate setup fee. After that you are paying for the flow of videos.</p>
+      </div>
+
+      <div class="grid items-stretch gap-4 xl:grid-cols-3" data-reveal>
+        <!-- TAKE -->
+        <article class="plan-card">
+          <h3 class="font-display text-[1.05rem] font-normal tracking-[0.02em] uppercase">Take</h3>
+          <p class="flex flex-wrap items-baseline gap-1.5">
+            <span class="font-display text-[clamp(2.6rem,4.6vw,3.6rem)] leading-[0.95] font-extralight tracking-[-0.05em] tabular">$300</span>
+            <span class="font-mono text-[11px] tracking-[0.12em] text-ash uppercase">/ month</span>
+          </p>
+          <p class="text-sm leading-[1.55] text-mist">Proving the idea. Founders and small teams that just need to start showing up on video.</p>
+          <ul class="flex flex-1 list-none flex-col gap-2.5 p-0">
+            <li class="plan-feature">1 digital avatar<small>One look: backdrop, lighting, wardrobe</small></li>
+            <li class="plan-feature">Voice clone<small>English plus one more language</small></li>
+            <li class="plan-feature">8 vertical videos a month<small>Up to 60 seconds, 9:16</small></li>
+            <li class="plan-feature">30-day content plan<small>30 topics with the hooks written</small></li>
+            <li class="plan-feature">Editing, captions, thumbnails</li>
+            <li class="plan-feature">HeyGen subscription on us</li>
+            <li class="plan-feature">One revision round per video</li>
+            <li class="plan-feature">Turnaround: avatar in 5 days, video in 48 hours</li>
+          </ul>
+          <button type="button" class="btn w-full" data-plan="take">Start with a take</button>
+          <p class="text-center font-mono text-[10.5px] tracking-[0.1em] text-ash uppercase">Twin build included</p>
+        </article>
+
+        <!-- SCENE -->
+        <article class="plan-card plan-card-hot order-first xl:order-none">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="font-display text-[1.05rem] font-normal tracking-[0.02em] uppercase">Scene</h3>
+            <span class="rounded-sm bg-flare px-[0.7em] py-[0.45em] font-mono text-[9.5px] font-medium tracking-[0.14em] whitespace-nowrap text-[#190800] uppercase">Most picked</span>
+          </div>
+          <p class="flex flex-wrap items-baseline gap-1.5">
+            <span class="font-display text-[clamp(2.6rem,4.6vw,3.6rem)] leading-[0.95] font-extralight tracking-[-0.05em] tabular">$1,000</span>
+            <span class="font-mono text-[11px] tracking-[0.12em] text-ash uppercase">/ month</span>
+          </p>
+          <p class="text-sm leading-[1.55] text-mist">The workhorse. For anyone running a personal brand or warming a funnel who needs a steady flow.</p>
+          <ul class="flex flex-1 list-none flex-col gap-2.5 p-0">
+            <li class="plan-feature">3 avatars<small>Different looks and locations per rubric</small></li>
+            <li class="plan-feature">Voice with emotional presets<small>Calm, high-energy, confiding</small></li>
+            <li class="plan-feature">30 videos a month<small>Reels, Shorts, TikTok — each cut for its platform</small></li>
+            <li class="plan-feature">Quarterly strategy and rubric</li>
+            <li class="plan-feature">A/B tests on the first 3 seconds<small>Two openings per video, we keep the winner</small></li>
+            <li class="plan-feature">Lip-sync translation into 3 languages</li>
+            <li class="plan-feature">HeyGen, ElevenLabs, Midjourney — on us</li>
+            <li class="plan-feature">A producer on Telegram, replies within 2 hours</li>
+            <li class="plan-feature">Dashboard: reach, retention, inbound</li>
+          </ul>
+          <button type="button" class="btn btn-flare w-full" data-plan="scene">Start the flow</button>
+          <p class="text-center font-mono text-[10.5px] tracking-[0.1em] text-ash uppercase">First video on day 7</p>
+        </article>
+
+        <!-- PREMIERE -->
+        <article class="plan-card">
+          <h3 class="font-display text-[1.05rem] font-normal tracking-[0.02em] uppercase">Premiere</h3>
+          <p class="flex flex-wrap items-baseline gap-1.5">
+            <span class="font-display text-[clamp(2.6rem,4.6vw,3.6rem)] leading-[0.95] font-extralight tracking-[-0.05em] tabular">$2,500</span>
+            <span class="font-mono text-[11px] tracking-[0.12em] text-ash uppercase">/ month</span>
+          </p>
+          <p class="text-sm leading-[1.55] text-mist">Full production, handled. For brands, agencies and anyone whose main sales channel is video.</p>
+          <ul class="flex flex-1 list-none flex-col gap-2.5 p-0">
+            <li class="plan-feature">Unlimited looks<small>4K studio shoot, re-shoots on request</small></li>
+            <li class="plan-feature">90 videos a month<small>Reels, landing-page video, email, evergreen webinar</small></li>
+            <li class="plan-feature">A producer and scriptwriter of your own<small>One named person on your account</small></li>
+            <li class="plan-feature">The whole cycle: plan → take → edit → publish</li>
+            <li class="plan-feature">Lip-sync in 8 languages, localised per market</li>
+            <li class="plan-feature">Your twin inside the funnel<small>Greetings by name, support replies, webinars</small></li>
+            <li class="plan-feature">Licensed actor avatars for UGC</li>
+            <li class="plan-feature">24-hour SLA, overnight urgent takes</li>
+            <li class="plan-feature">All rights and source files handed over</li>
+          </ul>
+          <button type="button" class="btn w-full" data-plan="premiere">Talk about Premiere</button>
+          <p class="text-center font-mono text-[10.5px] tracking-[0.1em] text-ash uppercase">Four projects a month</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== ONE-OFF RATES ============================== -->
+  <section id="rates" class="scroll-mt-20 pb-[clamp(64px,10vw,140px)]">
+    <div class="shell">
+      <div class="mb-[clamp(36px,6vw,68px)] flex flex-col gap-5" data-reveal>
+        <p class="eyebrow">One-off work</p>
+        <h2 class="display-lg">No subscription.</h2>
+      </div>
+
+      <dl class="border border-edge bg-ink-2" data-reveal>
+        <div class="grid grid-cols-[1fr_auto] items-baseline gap-4 border-b border-edge px-[clamp(18px,2.4vw,28px)] py-[18px]">
+          <dt class="min-w-0">
+            <strong class="text-[15px] font-medium">Avatar, done for you</strong>
+            <p class="mt-0.5 max-w-[62ch] text-[13px] leading-[1.5] text-ash">Shoot, build, test take. We hand over the login and you shoot yourself.</p>
+          </dt>
+          <dd class="font-mono text-[15px] whitespace-nowrap text-flare-hi tabular">$600</dd>
+        </div>
+        <div class="grid grid-cols-[1fr_auto] items-baseline gap-4 border-b border-edge px-[clamp(18px,2.4vw,28px)] py-[18px]">
+          <dt class="min-w-0">
+            <strong class="text-[15px] font-medium">Voice clone</strong>
+            <p class="mt-0.5 max-w-[62ch] text-[13px] leading-[1.5] text-ash">Fifteen minutes of recording, noise cleanup, two emotional presets.</p>
+          </dt>
+          <dd class="font-mono text-[15px] whitespace-nowrap text-flare-hi tabular">$150</dd>
+        </div>
+        <div class="grid grid-cols-[1fr_auto] items-baseline gap-4 border-b border-edge px-[clamp(18px,2.4vw,28px)] py-[18px]">
+          <dt class="min-w-0">
+            <strong class="text-[15px] font-medium">A single video</strong>
+            <p class="mt-0.5 max-w-[62ch] text-[13px] leading-[1.5] text-ash">Script, take, edit, captions. Up to 60 seconds.</p>
+          </dt>
+          <dd class="font-mono text-[15px] whitespace-nowrap text-flare-hi tabular">$80</dd>
+        </div>
+        <div class="grid grid-cols-[1fr_auto] items-baseline gap-4 border-b border-edge px-[clamp(18px,2.4vw,28px)] py-[18px]">
+          <dt class="min-w-0">
+            <strong class="text-[15px] font-medium">Lip-sync translation</strong>
+            <p class="mt-0.5 max-w-[62ch] text-[13px] leading-[1.5] text-ash">Per language, per video. Lips match the new track.</p>
+          </dt>
+          <dd class="font-mono text-[15px] whitespace-nowrap text-flare-hi tabular">$45</dd>
+        </div>
+        <div class="grid grid-cols-[1fr_auto] items-baseline gap-4 px-[clamp(18px,2.4vw,28px)] py-[18px]">
+          <dt class="min-w-0">
+            <strong class="text-[15px] font-medium">30-day content plan</strong>
+            <p class="mt-0.5 max-w-[62ch] text-[13px] leading-[1.5] text-ash">Rubric, topics, hooks, calendar. No production.</p>
+          </dt>
+          <dd class="font-mono text-[15px] whitespace-nowrap text-flare-hi tabular">$250</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+    </div>
+
+  <!-- =========================== FINALE · THE CALL =========================== -->
+  <div class="scene scene--finale" data-scene="04">
+    <div class="shell"><div class="scene-slate" data-reveal><span class="scene-slate__no">Scene 04</span><span class="scene-slate__rule"></span><span class="scene-slate__title">Finale</span></div></div>
+  <!-- ============================== FAQ ============================== -->
+  <section id="faq" class="scroll-mt-20 pb-[clamp(64px,10vw,140px)]">
+    <div class="shell">
+      <div class="mb-[clamp(36px,6vw,68px)] flex flex-col gap-5" data-reveal>
+        <p class="eyebrow">FAQ</p>
+        <h2 class="display-lg">What people ask first.</h2>
+      </div>
+
+      <div class="border-t border-edge" data-faq data-reveal>
+        <details class="group border-b border-edge" open>
+          <summary class="relative cursor-pointer py-6 pr-12 font-display text-[clamp(1rem,1.7vw,1.18rem)] leading-[1.3] font-normal tracking-[-0.02em]">
+            Can people tell it isn't me?
+            <span class="absolute top-[22px] right-2 font-mono text-xl text-flare transition-transform duration-250 group-open:rotate-45">+</span>
+          </summary>
+          <p class="mb-6 max-w-[70ch] text-[15px] text-mist">On vertical video under 60 seconds, effectively no. We separately clean up eye contact, pauses and hand gestures — that is where the eye catches a fake. Before launch you get a test take and you either say "that's me" or we rebuild it; revisions aren't capped at that stage.</p>
+        </details>
+        <details class="group border-b border-edge">
+          <summary class="relative cursor-pointer py-6 pr-12 font-display text-[clamp(1rem,1.7vw,1.18rem)] leading-[1.3] font-normal tracking-[-0.02em]">
+            How much footage do you need from me?
+            <span class="absolute top-[22px] right-2 font-mono text-xl text-flare transition-transform duration-250 group-open:rotate-45">+</span>
+          </summary>
+          <p class="mb-6 max-w-[70ch] text-[15px] text-mist">Four minutes of video and fifteen minutes of speech. That fits into 40 minutes including the lighting setup. Shoot at our studio, or at yours — in that case we ship lights, a lav mic and a framing guide.</p>
+        </details>
+        <details class="group border-b border-edge">
+          <summary class="relative cursor-pointer py-6 pr-12 font-display text-[clamp(1rem,1.7vw,1.18rem)] leading-[1.3] font-normal tracking-[-0.02em]">
+            Who owns the avatar and the voice?
+            <span class="absolute top-[22px] right-2 font-mono text-xl text-flare transition-transform duration-250 group-open:rotate-45">+</span>
+          </summary>
+          <p class="mb-6 max-w-[70ch] text-[15px] text-mist">You do. We sign a likeness and voice release plus a contract that leaves the twin and every deliverable with you. On Premiere we hand over the source files and models at the end. If you leave, the twin is deleted from our accounts on your request.</p>
+        </details>
+        <details class="group border-b border-edge">
+          <summary class="relative cursor-pointer py-6 pr-12 font-display text-[clamp(1rem,1.7vw,1.18rem)] leading-[1.3] font-normal tracking-[-0.02em]">
+            What if I need to say something urgently?
+            <span class="absolute top-[22px] right-2 font-mono text-xl text-flare transition-transform duration-250 group-open:rotate-45">+</span>
+          </summary>
+          <p class="mb-6 max-w-[70ch] text-[15px] text-mist">Standard turnaround is 48 hours from approved copy. Scene and Premiere include urgent takes: send the text, get the finished video back in 24 hours — overnight on Premiere.</p>
+        </details>
+        <details class="group border-b border-edge">
+          <summary class="relative cursor-pointer py-6 pr-12 font-display text-[clamp(1rem,1.7vw,1.18rem)] leading-[1.3] font-normal tracking-[-0.02em]">
+            How does paying for all the AI tools work?
+            <span class="absolute top-[22px] right-2 font-mono text-xl text-flare transition-transform duration-250 group-open:rotate-45">+</span>
+          </summary>
+          <p class="mb-6 max-w-[70ch] text-[15px] text-mist">Every subscription — HeyGen, ElevenLabs, background generation — sits on our accounts and is inside the plan. You get one invoice a month, on contract, with proper paperwork. No card details in five dashboards and no credit running out mid-month.</p>
+        </details>
+        <details class="group border-b border-edge">
+          <summary class="relative cursor-pointer py-6 pr-12 font-display text-[clamp(1rem,1.7vw,1.18rem)] leading-[1.3] font-normal tracking-[-0.02em]">
+            What if the content doesn't land?
+            <span class="absolute top-[22px] right-2 font-mono text-xl text-flare transition-transform duration-250 group-open:rotate-45">+</span>
+          </summary>
+          <p class="mb-6 max-w-[70ch] text-[15px] text-mist">We treat month one as a test: we watch three-second retention and completion rate, then swap hooks and rubrics. If you stop after the first month the twin stays with you, with nothing more to pay for it.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== BOOKING ============================== -->
+  <section id="book" class="shell scroll-mt-20 pb-[clamp(24px,4vw,48px)]">
+    <div class="relative overflow-hidden border border-edge-hi bg-[radial-gradient(70%_120%_at_50%_0%,rgba(255,106,26,0.13),#0b0c10_62%)] p-[clamp(24px,4vw,64px)]">
+      <!-- Last frame of the head turn: by the finale he is looking at the form. -->
+      <img class="booking-diver" src="/assets/img/diver/seq/f060.webp" alt="" width="876" height="1052" loading="lazy" decoding="async">
+      <div class="booking-body grid gap-[clamp(32px,5vw,64px)] lg:grid-cols-[0.9fr_1.1fr]">
+
+        <div class="flex flex-col gap-6">
+          <p class="eyebrow">
+            Slots open for <span data-availability-month>October</span>:
+            <b data-availability-slots>4</b>
+          </p>
+          <h2 class="display-lg">Shoot one set — <span class="text-shadow-text">then forget the camera.</span></h2>
+          <p class="lede">
+            Send a link to your profile. We come back with the rubrics that suit you and show you a
+            twin from a comparable project — before you pay anything.
+          </p>
+          <ul class="mt-2 flex list-none flex-col gap-3 p-0 text-[14.5px] text-mist">
+            <li class="plan-feature">A reply within one working day</li>
+            <li class="plan-feature">No deposit until you have seen a test take</li>
+            <li class="plan-feature">Or just write to <a href="mailto:hi@doubletake.studio" class="text-flare-hi underline decoration-flare/40 underline-offset-4 hover:decoration-flare">hi@doubletake.studio</a></li>
+          </ul>
+        </div>
+
+        <!-- POSTs to /api/leads -->
+        <form id="lead-form" class="flex w-full max-w-[640px] flex-col gap-4" novalidate>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label class="field-label" for="lead-name">Your name</label>
+              <input class="field" id="lead-name" name="name" type="text" autocomplete="name"
+                     placeholder="Alex Moreau" required>
+              <span class="field-hint" data-error-for="name" hidden></span>
+            </div>
+            <div>
+              <label class="field-label" for="lead-email">Email</label>
+              <input class="field" id="lead-email" name="email" type="email" autocomplete="email"
+                     placeholder="alex@studio.com" required>
+              <span class="field-hint" data-error-for="email" hidden></span>
+            </div>
+          </div>
+
+          <div>
+            <label class="field-label" for="lead-profile">Link to your profile <span class="text-ash/60">(optional)</span></label>
+            <input class="field" id="lead-profile" name="profileUrl" type="url"
+                   placeholder="https://instagram.com/yourhandle">
+            <span class="field-hint" data-error-for="profileUrl" hidden></span>
+          </div>
+
+          <div>
+            <label class="field-label" for="lead-plan">What are you after</label>
+            <select class="field" id="lead-plan" name="plan" required>
+              <option value="not-sure">Not sure yet — advise me</option>
+              <option value="take">Take — $300 / month</option>
+              <option value="scene">Scene — $1,000 / month</option>
+              <option value="premiere">Premiere — $2,500 / month</option>
+              <option value="one-off">One-off work, no subscription</option>
+            </select>
+            <span class="field-hint" data-error-for="plan" hidden></span>
+          </div>
+
+          <div>
+            <label class="field-label" for="lead-message">What should the twin be selling? <span class="text-ash/60">(optional)</span></label>
+            <textarea class="field resize-y" id="lead-message" name="message" rows="4"
+                      placeholder="Product, audience, where you post today."></textarea>
+            <span class="field-hint" data-error-for="message" hidden></span>
+          </div>
+
+          <!-- Spam trap: hidden from people, irresistible to bots -->
+          <div class="absolute -left-[9999px]" aria-hidden="true">
+            <label for="lead-company">Company</label>
+            <input id="lead-company" name="honeypot" type="text" tabindex="-1" autocomplete="off">
+          </div>
+
+          <button type="submit" class="btn btn-flare mt-2 w-full" data-submit>
+            <span data-submit-label>Request a set</span>
+          </button>
+
+          <p class="min-h-6 text-center text-[13.5px]" role="status" aria-live="polite" data-form-status></p>
+        </form>
+      </div>
+    </div>
+  </section>
+  </div>
+</main>
+
+<!-- ============================== FOOTER ============================== -->
+<footer class="mt-[clamp(56px,9vw,120px)] border-t border-edge pt-10 pb-14">
+  <div class="shell flex flex-wrap items-center justify-between gap-6">
+    <a href="#top" class="flex items-baseline gap-1.5 font-display text-[19px] font-medium tracking-[-0.05em]">
+      double take
+      <span class="inline-block size-1.5 rounded-full bg-flare shadow-[0_0_12px_#ff6a1a]"></span>
+    </a>
+    <nav class="flex flex-wrap gap-5.5 text-sm text-mist" aria-label="Sections">
+      <a href="#how" class="hover:text-flare-hi">How it works</a>
+      <a href="#plans" class="hover:text-flare-hi">Plans</a>
+      <a href="#rates" class="hover:text-flare-hi">One-off</a>
+      <a href="#faq" class="hover:text-flare-hi">FAQ</a>
+    </nav>
+    <p class="font-mono text-[11px] tracking-[0.1em] text-ash uppercase">Digital twin studio · 2026</p>
+  </div>
+</footer>
+
+<!-- Faint amber glow trailing the mouse — modules/cursorAura.js. Mouse-only. -->
+<div class="cursor-aura" data-cursor-aura aria-hidden="true"></div>
+
+</body>
+</html>

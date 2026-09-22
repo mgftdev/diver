@@ -1,0 +1,17 @@
+node_modules/
+.env
+data/*.ndjson
+public/assets/css/site.css
+*.log
+.DS_Store
+
+# Static build for GitHub Pages — produced in CI
+dist/
+
+# Local-only working files, kept out of the public repository:
+# the Kling source clip (carries a free-tier watermark), generation stills,
+# the owner's raw ChatGPT renders, and editor tooling config.
+diver.mp4
+kling/
+/robot*.png
+.claude/

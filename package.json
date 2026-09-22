@@ -1,0 +1,34 @@
+{
+  "name": "double-take",
+  "version": "1.0.0",
+  "description": "Digital twin studio — landing page and lead API",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "concurrently -n css,srv -c magenta,cyan \"npm:dev:css\" \"npm:dev:server\"",
+    "dev:css": "tailwindcss -i ./src/styles/tailwind.css -o ./public/assets/css/site.css --watch",
+    "dev:server": "nodemon --watch server --ext js,json server/index.js",
+    "build": "tailwindcss -i ./src/styles/tailwind.css -o ./public/assets/css/site.css --minify",
+    "start": "node server/index.js",
+    "build:static": "node scripts/build-static.mjs"
+  },
+  "dependencies": {
+    "compression": "^1.8.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0",
+    "three": "^0.186.0",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "concurrently": "^9.2.1",
+    "esbuild": "^0.28.2",
+    "nodemon": "^3.1.10",
+    "tailwindcss": "^4.1.13"
+  }
+}

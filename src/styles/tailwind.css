@@ -1,0 +1,607 @@
+@import "tailwindcss";
+
+/* Tailwind v4 scans these for class names. */
+@source "../../public/**/*.{html,js}";
+
+/* ==========================================================================
+   THEME — the design tokens. Every colour and face on the site comes from
+   here, so a rebrand is a change to this block and nothing else.
+   ========================================================================== */
+@theme {
+  /* Grounds: near-black with a slight blue bias, so the warm accent reads warm */
+  --color-ink: #08080b;
+  --color-ink-2: #0b0c10;
+  --color-panel: #11121a;
+  --color-panel-2: #171926;
+
+  /* Hairlines */
+  --color-edge: #20222e;
+  --color-edge-hi: #2e313f;
+
+  /* Text */
+  --color-chalk: #f4f3f1;
+  --color-mist: #9b9ca8;
+  --color-ash: #7a7c88; /* 4.83:1 on ink, 4.5:1 on panel — AA for small text */
+  --color-shadow-text: #5c5d66; /* 3.06:1 — the dim clause of large headlines */
+
+  /* The one accent: a tungsten-lamp amber */
+  --color-flare: #ff6a1a;
+  --color-flare-hi: #ffb25c;
+  --color-flare-deep: #b33f06;
+
+  --font-display: "Unbounded", "Trebuchet MS", sans-serif;
+  --font-body: "Golos Text", "Segoe UI", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+
+  --animate-marquee: marquee 34s linear infinite;
+  --animate-rec: rec 2.4s ease-in-out infinite;
+  --animate-rise: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes rec {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-chalk);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-flare);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-flare);
+    color: #180800;
+  }
+
+  /* Native disclosure marker replaced by the + / × in .faq-item */
+  summary {
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   COMPONENTS — only for patterns that repeat enough that utilities in the
+   markup would obscure the structure. Everything else stays inline.
+   ========================================================================== */
+@layer components {
+  /* Wide enough to fill a 2000px display rather than sitting in a 1280px column;
+     the gutter grows with the viewport so content never touches the edge.
+     Individual text blocks carry their own max-width — see the `ch` caps below
+     and in the markup — because line length, not container width, is what has to
+     stay readable. */
+  .shell {
+    @apply mx-auto w-full max-w-[1920px] px-[clamp(18px,4vw,80px)];
+  }
+
+  .eyebrow {
+    @apply font-mono text-[11px] tracking-[0.18em] text-ash uppercase;
+  }
+  .eyebrow b {
+    @apply font-medium text-flare;
+  }
+
+  .display-xl {
+    @apply font-display text-[clamp(2.1rem,7.6vw,6.4rem)] leading-[0.9] font-extralight tracking-[-0.05em];
+  }
+  /* Capped in characters, not pixels: at full container width a section title
+     would otherwise set 50+ characters on one line. */
+  .display-lg {
+    @apply max-w-[20ch] font-display text-[clamp(2rem,5.4vw,4.2rem)] leading-[0.98] font-light tracking-[-0.035em] text-balance;
+  }
+  .display-sm {
+    @apply font-display text-[clamp(1.05rem,2vw,1.35rem)] leading-[1.15] font-normal tracking-[-0.02em];
+  }
+  .lede {
+    @apply max-w-[62ch] text-[clamp(1rem,1.5vw,1.125rem)] text-mist;
+  }
+
+  .btn {
+    @apply inline-flex cursor-pointer items-center justify-center gap-[0.6em] rounded-full border border-edge-hi
+      px-8 py-[1.15em] font-mono text-xs tracking-[0.14em] uppercase
+      transition-[background-color,border-color,color,transform] duration-250 hover:-translate-y-px
+      hover:border-mist disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-solid {
+    @apply border-chalk bg-chalk font-medium text-[#0a0a0d]
+      hover:border-flare-hi hover:bg-flare-hi hover:text-[#1a0b02];
+  }
+  .btn-flare {
+    @apply border-flare bg-flare font-medium text-[#180800] hover:border-flare-hi hover:bg-flare-hi;
+  }
+
+  .chip {
+    @apply rounded-full border border-edge px-[1.15em] py-[0.7em] font-mono text-[11px]
+      tracking-[0.12em] text-mist uppercase;
+  }
+
+  /* The two layers inside [data-diver]: the resting-frame <img> and the canvas the
+     frame sequence is drawn onto. The canvas stays invisible until the script marks
+     it ready, so no-JS and reduced-motion visitors only ever see the image. */
+  .diver-layer {
+    @apply absolute inset-0 size-full;
+  }
+  .diver-canvas {
+    @apply opacity-0;
+  }
+  .diver-canvas[data-ready] {
+    @apply opacity-100;
+  }
+
+  /* Soft amber glow that trails the mouse. Deliberately faint — it warms the area
+     around the pointer rather than lighting it. Plain alpha, no mix-blend-mode: this
+     element moves every frame, and a blended element on its own compositing layer is
+     exactly what broke the hero's blend before. Over a near-black page, low-alpha
+     orange and screen blending look the same anyway. */
+  .cursor-aura {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 40; /* above content, below the sticky nav (z-50) */
+    width: 560px;
+    height: 560px;
+    border-radius: 9999px;
+    pointer-events: none;
+    background: radial-gradient(
+      circle closest-side,
+      color-mix(in oklab, var(--color-flare) 9%, transparent) 0%,
+      color-mix(in oklab, var(--color-flare) 4%, transparent) 45%,
+      transparent 100%
+    );
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    will-change: transform;
+  }
+  .cursor-aura[data-active] {
+    opacity: 1;
+  }
+  /* No cursor to follow on touch screens; no trailing motion for reduced motion. */
+  @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .cursor-aura {
+      display: none;
+    }
+  }
+
+  /* One marquee entry. Lived as a 12-class string repeated on 16 spans; the JS
+     module clones from this, so keeping it a single class matters. Name colour is
+     #5b5d6a — 3.07:1, the lowest that still passes for large text. */
+  .marquee-item {
+    @apply flex items-center gap-14 font-display text-[clamp(0.95rem,1.7vw,1.3rem)]
+      font-light tracking-[-0.02em] whitespace-nowrap text-[#5b5d6a]
+      after:size-[5px] after:rounded-full after:bg-flare-deep after:content-[''];
+  }
+
+  /* Hero stat tile: dark enough for the numbers to hold, sheer enough that the
+     robot render continues through it. */
+  .stat-cell {
+    @apply flex min-w-0 flex-col gap-1.5 bg-ink-2/60 px-[22px] pt-5 pb-[18px] backdrop-blur-[2px];
+  }
+
+  .plan-card {
+    @apply flex min-w-0 flex-col gap-6 border border-edge bg-panel p-[clamp(24px,2.6vw,34px)]
+      transition-[border-color,transform] duration-300 hover:-translate-y-[3px] hover:border-edge-hi;
+  }
+  .plan-card-hot {
+    @apply border-flare/40 bg-linear-175 from-[#1b1520] to-panel-2 to-42%
+      shadow-[0_30px_80px_-40px_rgba(255,106,26,0.5)] hover:border-flare;
+  }
+  .plan-feature {
+    @apply relative pl-5 text-[14.5px] leading-[1.5]
+      before:absolute before:top-[0.6em] before:left-0 before:h-px before:w-[7px] before:bg-flare before:content-[''];
+  }
+  .plan-feature small {
+    @apply mt-0.5 block text-[12.5px] leading-[1.45] text-ash;
+  }
+
+  .field-label {
+    @apply mb-2 block font-mono text-[10.5px] tracking-[0.14em] text-ash uppercase;
+  }
+  .field {
+    @apply w-full border border-edge bg-ink px-4 py-3.5 text-[15px] text-chalk
+      transition-colors duration-200 placeholder:text-ash/70
+      hover:border-edge-hi focus:border-flare focus:outline-none;
+  }
+  .field-error {
+    @apply border-red-500/60;
+  }
+  .field-hint {
+    @apply mt-1.5 block text-[12.5px] leading-snug text-red-400;
+  }
+}
+
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+@layer utilities {
+  /* Dissolves the robot render's frame into the page ground. Its "black" is not
+     quite #000, so without this the screen blend leaves a faint rectangle over
+     the hero glow. Two layers intersected, because one radial cannot both keep
+     the helmet's rim light crisp and fade the cropped torso:
+       · radial  — vignettes the left and right edges only
+       · linear  — fades the bottom out before the render's hard crop, and
+                   feathers the very top where the glow is brightest */
+  .mask-robot {
+    mask-image:
+      radial-gradient(50% 76% at 50% 42%, #000 74%, transparent 100%),
+      linear-gradient(180deg, transparent 0%, #000 4%, #000 78%, transparent 99%);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+  /* Wide enough that a word dissolves rather than looking chopped by the edge. */
+  .mask-fade-x {
+    mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ==========================================================================
+   PAGE — scenes, film strip, comparison table, booking finale, nav timecode,
+   reveals and the dotted surface. Promoted from the redesign preview.
+   ========================================================================== */
+@layer components {
+  /* ---- Chapters: the page as a cut in scenes -------------------------------- */
+  .scene {
+    position: relative;
+    isolation: isolate;
+  }
+  /* The amber builds scene by scene toward the booking finale. */
+  .scene::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+      70% 38% at 50% 0%,
+      color-mix(in oklab, var(--color-flare) var(--scene-glow, 4%), transparent),
+      transparent 72%
+    );
+  }
+  .scene--1 { --scene-glow: 3%; }
+  .scene--2 { --scene-glow: 5%; }
+  .scene--3 { --scene-glow: 7%; }
+  .scene--finale { --scene-glow: 11%; }
+
+  .scene-slate {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-block: clamp(48px, 7vw, 88px) clamp(28px, 4vw, 48px);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-ash);
+  }
+  .scene-slate__no { color: var(--color-flare); white-space: nowrap; }
+  .scene-slate__title { white-space: nowrap; color: var(--color-chalk); }
+  .scene-slate__rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--color-edge-hi), transparent);
+  }
+
+  /* Mini call to action closing each scene. */
+  .scene-next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 22px;
+    padding-bottom: clamp(56px, 8vw, 104px);
+  }
+  .scene-next__hint {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-ash);
+  }
+
+  /* ---- Nav: live timecode + scroll progress --------------------------------- */
+  .nav-timecode {
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--color-ash);
+    font-variant-numeric: tabular-nums;
+  }
+  .nav-timecode [data-tc-scene] { color: var(--color-flare); }
+  .nav-progress {
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 1px;
+    background: var(--color-flare);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  /* ---- Hero scroll cue ------------------------------------------------------ */
+  .scroll-cue {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-ash);
+  }
+  .scroll-cue__line {
+    position: relative;
+    width: 44px;
+    height: 1px;
+    overflow: hidden;
+    background: var(--color-edge-hi);
+  }
+  .scroll-cue__line::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    background: var(--color-flare);
+    animation: cue-run 2.2s ease-in-out infinite;
+  }
+  @keyframes cue-run {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(260%); }
+  }
+
+  /* ---- Process as a film strip ---------------------------------------------- */
+  .filmstrip {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin: 0;
+    padding: 30px 10px;
+    list-style: none;
+    background: var(--color-ink-2);
+    border-block: 1px solid var(--color-edge);
+  }
+  @media (min-width: 768px) { .filmstrip { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1280px) { .filmstrip { grid-template-columns: repeat(4, 1fr); } }
+  /* Sprocket holes along both edges. */
+  .filmstrip::before,
+  .filmstrip::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    height: 8px;
+    background-image: radial-gradient(circle, var(--color-edge-hi) 0 2.5px, transparent 3px);
+    background-size: 20px 8px;
+    background-repeat: repeat-x;
+  }
+  .filmstrip::before { top: 10px; }
+  .filmstrip::after { bottom: 10px; }
+  .filmstrip__frame {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: clamp(22px, 2.6vw, 32px);
+    background: var(--color-ink);
+    border: 1px solid var(--color-edge);
+  }
+  /* The one frame that needs the client — the headline says so. */
+  .filmstrip__frame--you {
+    border-color: color-mix(in oklab, var(--color-flare) 45%, transparent);
+    background: linear-gradient(170deg, color-mix(in oklab, var(--color-flare) 9%, var(--color-ink)), var(--color-ink) 55%);
+  }
+  .filmstrip__meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ash);
+  }
+  .filmstrip__no { color: var(--color-mist); }
+  .filmstrip__frame--you .filmstrip__no { color: var(--color-flare); }
+  .filmstrip__tag {
+    align-self: flex-start;
+    padding: 0.4em 0.7em;
+    border-radius: 3px;
+    background: var(--color-flare);
+    color: #190800;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .filmstrip__frame p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--color-mist);
+  }
+
+  /* ---- The arithmetic as a single comparison table -------------------------- */
+  .versus {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--color-edge);
+  }
+  .versus th,
+  .versus td {
+    padding: 18px clamp(16px, 2.4vw, 28px);
+    border-bottom: 1px solid var(--color-edge);
+    text-align: left;
+    vertical-align: baseline;
+  }
+  .versus thead th {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-ash);
+  }
+  .versus tbody th {
+    width: 26%;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ash);
+  }
+  .versus tbody td {
+    font-family: var(--font-display);
+    font-size: clamp(1.05rem, 1.9vw, 1.45rem);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    color: #6f7180; /* 4.14:1 — large text */
+  }
+  /* On the value only: a decoration on the cell would propagate into the
+     phone-layout label drawn by ::before, and cannot be undone there. */
+  .versus .versus__value {
+    text-decoration: line-through;
+    text-decoration-color: var(--color-edge-hi);
+    text-decoration-thickness: 1px;
+  }
+  .versus .versus__win {
+    color: var(--color-chalk);
+    background: color-mix(in oklab, var(--color-flare) 6%, transparent);
+    border-left: 1px solid color-mix(in oklab, var(--color-flare) 45%, transparent);
+  }
+  .versus thead .versus__win { color: var(--color-flare); }
+  /* Phones: each row becomes a label over a before/after pair. */
+  @media (max-width: 640px) {
+    .versus thead { display: none; }
+    .versus tr { display: grid; grid-template-columns: 1fr 1fr; }
+    .versus tbody th { grid-column: 1 / -1; width: auto; border-bottom: 0; padding-bottom: 4px; }
+    .versus td::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 6px;
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-ash);
+    }
+  }
+
+  /* ---- Booking finale: the diver has turned to face the form ---------------- */
+  .booking-diver {
+    position: absolute;
+    left: 20%;
+    bottom: -32%;
+    z-index: 0;
+    height: 128%;
+    width: auto;
+    max-width: none;
+    pointer-events: none;
+    /* Sits in the gutter between copy and form, facing the form. Fainter than the
+       hero diver on purpose: here he is a callback, not the subject. */
+    opacity: 0.62;
+    filter: blur(1px) brightness(0.8);
+    mix-blend-mode: screen;
+    mask-image: radial-gradient(50% 60% at 50% 40%, #000 55%, transparent 100%);
+  }
+  .booking-body { position: relative; z-index: 1; }
+  /* The form sits on its own near-opaque surface, so its small labels keep 4.5:1
+     wherever the diver's bright metal falls behind them. */
+  .booking-body form {
+    padding: clamp(18px, 2.4vw, 28px);
+    border: 1px solid var(--color-edge);
+    background: color-mix(in oklab, var(--color-ink) 84%, transparent);
+    backdrop-filter: blur(6px);
+  }
+  @media (max-width: 1023px) { .booking-diver { display: none; } }
+
+  /* ---- Dotted wave surface behind Scene 01 (modules/dottedSurface.js) ------- */
+  .dotted-surface {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    /* Dissolve into the scenes above and below instead of ending on a line. */
+    mask-image: linear-gradient(180deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+  }
+  /* Viewport-tall and sticky: it acts like the original full-screen background, but
+     only while this scene scrolls past. No overflow:hidden on the host — that would
+     turn it into the sticky element's scroll container and stop it sticking. */
+  .dotted-surface__layer {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+  }
+  /* The comparison table keeps its own surface so rows stay readable over the dots. */
+  .versus {
+    background: color-mix(in oklab, var(--color-ink) 78%, transparent);
+  }
+
+  /* ---- Reveal on scroll — only once JS has opted in ------------------------- */
+  [data-reveal] {
+    transition:
+      opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-ready [data-reveal]:not(.is-in) {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
