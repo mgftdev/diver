@@ -111,10 +111,14 @@ scrubbing it backwards by scroll stutters. Single images are instant in both dir
   out on a phone. Desktop loads all 61.
 - The resting frame loads first with `fetchpriority="high"`; the other frames load only
   once the animation actually starts, so reduced-motion visitors never download them.
-- **The turn holds the diver still instead of pinning the page.** For the first
-  `clamp(260px, 50vh, 560px)` of scroll the module translates the box down by exactly
-  what the page scrolls, so the diver stays put while content flows past; then it
-  releases and leaves with the page. No scroll hijack.
+- **The diver holds still until the band has covered him — no page pinning.** The
+  module translates the box down by exactly what the page scrolls, so the diver stays
+  put while content flows past. The head turn plays over the first
+  `clamp(260px, 50vh, 560px)`; the hold lasts longer — until the band's top reaches the
+  diver's top (`coverDistance`, measured from the DOM on load/resize, ~770px at
+  1440×900). By then the band is opaque and the hero ends at its bottom edge, so the
+  diver has disappeared under it; only then does he move with the page (still hidden).
+  Owner's request: "the diver disappears under the carousel". No scroll hijack.
 - **That translation must stay 2D** — `translate()`, never `translate3d()`. A 3D
   transform promotes the box to its own compositing layer, where `mix-blend-screen`
   loses the glow and the black box comes back. Found by A/B, not assumed. (A canvas
@@ -152,6 +156,11 @@ Regression checks for the figure:
   (`pb-0`); with the diver moving during the hold, that is the only safe arrangement.
 - **The hold works.** The crown's screen y is identical at scroll 0 and at scroll ~150
   (375px) / ~300 (2000px).
+- **The band covers him.** At scroll = `coverDistance` the rig's top equals the band's
+  top, and beyond it they move together (0px of diver above the band).
+- Screenshots of scroll states in a hidden pane: override `window.scrollY` with a getter
+  and translate `<main>` by `-scrollY`, then dispatch `resize`. The page renders exactly
+  what that scroll position shows while the real scroll stays 0 (which is paintable).
 - **The turn plays.** Read the canvas: the x of the helmet lamp (warm pixels, top 16%)
   should rise monotonically from ~306 to ~495 as scroll goes 0 → the turn distance.
 - **Frames fetched:** 61 on desktop, 31 at 375px.

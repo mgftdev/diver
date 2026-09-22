@@ -6,11 +6,13 @@
  * scrubbed <video>: ordinary MP4s are keyframed sparsely, so seeking backwards
  * stutters; single images are instant in both directions.
  *
- * For the first stretch of scroll the rig holds still on screen — translated down by
- * exactly as much as the page moves up — while the head turns; after that it stops
- * compensating and leaves with the page. Nothing is pinned, nothing hijacks the scroll.
- * Holding is needed because the helmet sits right under the nav bar and would
- * otherwise leave view within ~230px, too fast to read a turn.
+ * The rig holds still on screen — translated down by exactly as much as the page
+ * moves up — while the head turns over the first stretch of scroll, and keeps holding
+ * until the tool band (the curtain) has swept up over it. The band is opaque by then
+ * and the hero ends at the band's bottom edge, so once the band's top passes the
+ * diver's top nothing of him is left to see: he disappears under the band. Only then
+ * does the hold stop. Nothing is pinned, nothing hijacks the scroll — the page moves
+ * normally the whole time; the diver waits.
  *
  * The rig's own `translate` (centring + crown anchor) comes from Tailwind utilities;
  * this writes `transform`, a separate property that composes with it.
@@ -51,6 +53,8 @@ export function initDiver() {
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let turnDistance = MIN_TURN_PX;
+  let coverDistance = MAX_TURN_PX; // scroll at which the band's top reaches the diver's top
+  let appliedHold = 0;
   let queued = false;
   let lastKey = '';
   let running = false;
@@ -99,6 +103,17 @@ export function initDiver() {
   const measure = () => {
     const share = window.innerHeight * TURN_VIEWPORT_SHARE;
     turnDistance = Math.min(MAX_TURN_PX, Math.max(MIN_TURN_PX, share));
+
+    // Document positions with the current hold taken back out. While held, the rig
+    // stays at its resting screen position and the band rises by 1px per 1px of scroll,
+    // so the band covers the diver after exactly (bandTop - rigTop) of scroll.
+    if (curtain) {
+      const rigTop = rig.getBoundingClientRect().top + window.scrollY - appliedHold;
+      const bandTop = curtain.getBoundingClientRect().top + window.scrollY;
+      coverDistance = Math.max(turnDistance, bandTop - rigTop);
+    } else {
+      coverDistance = turnDistance;
+    }
   };
 
   const render = () => {
@@ -110,7 +125,7 @@ export function initDiver() {
     const position = Math.min(1, scrolled / turnDistance) * (frames.length - 1);
     const base = Math.min(frames.length - 2, Math.floor(position));
     const blend = position - base;
-    const hold = Math.round(Math.min(scrolled, turnDistance));
+    const hold = Math.round(Math.min(scrolled, coverDistance));
 
     const closed = Math.min(1, scrolled / CURTAIN_CLOSED_PX);
     const key = `${base}|${blend.toFixed(2)}|${hold}|${closed.toFixed(2)}`;
@@ -134,6 +149,7 @@ export function initDiver() {
     // there mix-blend-mode loses the hero glow behind it: the render's black shows
     // as a box again. Verified by A/B in the browser, not assumed.
     rig.style.transform = `translate(0, ${hold}px)`;
+    appliedHold = hold;
 
     // Mixed from the ink-2 token rather than a literal, so the band keeps following
     // the theme. At 0 scroll this equals the markup's own bg-ink-2/60.
@@ -182,6 +198,7 @@ export function initDiver() {
     window.removeEventListener('resize', onResize);
     canvas.removeAttribute('data-ready');
     rig.style.removeProperty('transform');
+    appliedHold = 0;
     curtain?.style.removeProperty('background-color');
     lastKey = '';
   };
