@@ -177,6 +177,43 @@
     @apply opacity-100;
   }
 
+  /* The hold, done by the browser instead of by script. modules/diver.js lifts the rig
+     out of the h1 into this track once, measuring where it rests; from then on the
+     compositor keeps it still while the page scrolls — no per-frame JS, so it cannot
+     lag behind threaded scrolling the way a scroll-handler transform did.
+
+     - The track runs from the rig's resting top to the bottom of the hero (= the tool
+       band's bottom). The sticky child is 0px tall, so it stays stuck until the band's
+       bottom reaches the diver's top — by which time he is entirely under the opaque
+       band or below it, where the hero clips him. Release is invisible.
+     - mix-blend-mode sits on the track, not the rig: position:sticky makes its own
+       stacking context, and a blend inside it would only see that context — the
+       render's black would come back as a box. The track is the element that sits
+       in the hero's isolated context, next to the glow. */
+  .diver-track {
+    position: absolute;
+    top: var(--diver-track-top, 0px);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -10;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+  .diver-sticky {
+    position: sticky;
+    top: var(--diver-hold-top, 0px);
+    height: 0;
+  }
+
+  /* Clips like overflow:hidden but is not a scroll container, so the sticky hold
+     inside still sticks to the viewport. Browsers without `clip` keep `hidden`: the
+     diver then simply scrolls with the page. */
+  .hero-clip {
+    overflow: hidden;
+    overflow: clip;
+  }
+
   /* Soft amber glow that trails the mouse. Deliberately faint — it warms the area
      around the pointer rather than lighting it. Plain alpha, no mix-blend-mode: this
      element moves every frame, and a blended element on its own compositing layer is
@@ -601,4 +638,19 @@
     opacity: 0;
     transform: translateY(18px);
   }
+}
+
+/* ==========================================================================
+   UNLAYERED — must beat Tailwind utilities, which live in a later cascade layer
+   and would otherwise win over any component rule regardless of specificity.
+   ========================================================================== */
+
+/* The rig once modules/diver.js has lifted it into the sticky track: positioned at
+   the top of that track, with the centring translate and the blend removed (the
+   blend now sits on .diver-track — see there for why). */
+[data-diver].is-lifted {
+  top: 0;
+  left: var(--diver-left, 50%);
+  translate: none;
+  mix-blend-mode: normal;
 }

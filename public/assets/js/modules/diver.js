@@ -6,16 +6,16 @@
  * scrubbed <video>: ordinary MP4s are keyframed sparsely, so seeking backwards
  * stutters; single images are instant in both directions.
  *
- * The rig holds still on screen — translated down by exactly as much as the page
- * moves up — while the head turns over the first stretch of scroll, and keeps holding
- * until the tool band (the curtain) has swept up over it. The band is opaque by then
- * and the hero ends at the band's bottom edge, so once the band's top passes the
- * diver's top nothing of him is left to see: he disappears under the band. Only then
- * does the hold stop. Nothing is pinned, nothing hijacks the scroll — the page moves
- * normally the whole time; the diver waits.
+ * The hold — the diver staying still on screen while the page scrolls, until the tool
+ * band has swept up over him — is CSS `position: sticky`, set up once here (see
+ * .diver-track in tailwind.css). It used to be a transform written on every scroll
+ * event; browsers scroll on a separate thread, so that transform always arrived a
+ * frame late and the diver visibly jittered, worst right after a reload while the
+ * main thread was busy. Sticky is applied by the compositor in the same frame as the
+ * scroll, so it cannot lag.
  *
- * The rig's own `translate` (centring + crown anchor) comes from Tailwind utilities;
- * this writes `transform`, a separate property that composes with it.
+ * Per scroll, script now only picks the head-turn frame and the band's opacity —
+ * neither moves anything, so being a frame behind is invisible.
  */
 
 const MIN_TURN_PX = 260;
@@ -36,7 +36,8 @@ export function initDiver() {
   const canvas = rig?.querySelector('canvas');
   const pattern = rig?.dataset.frames;
   const count = Number(rig?.dataset.frameCount);
-  if (!rig || !canvas || !pattern || !count) return;
+  const hero = rig?.closest('section');
+  if (!rig || !canvas || !pattern || !count || !hero) return;
 
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
@@ -49,12 +50,10 @@ export function initDiver() {
   if (indices[indices.length - 1] !== count - 1) indices.push(count - 1);
 
   const url = (i) => pattern.replace('{n}', String(i).padStart(3, '0'));
-  const frames = new Array(indices.length).fill(null); // HTMLImageElement once decoded
+  const frames = new Array(indices.length).fill(null); // decoded HTMLImageElements
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let turnDistance = MIN_TURN_PX;
-  let coverDistance = MAX_TURN_PX; // scroll at which the band's top reaches the diver's top
-  let appliedHold = 0;
   let queued = false;
   let lastKey = '';
   let running = false;
@@ -65,8 +64,10 @@ export function initDiver() {
   const loadFrame = (slot) =>
     new Promise((resolve) => {
       const img = new Image();
-      img.decoding = 'async';
-      img.onload = () => {
+      img.onload = async () => {
+        // Decode off the main thread now, so the first drawImage of this frame
+        // during a scroll does not stall on a synchronous decode.
+        await img.decode().catch(() => {});
         frames[slot] = img;
         resolve();
       };
@@ -89,7 +90,7 @@ export function initDiver() {
     await Promise.all(Array.from({ length: LOAD_CONCURRENCY }, worker));
   };
 
-  /** Nearest decoded frame to `slot`, searching outward — never undefined once slot 0 has loaded. */
+  /** Nearest decoded frame to `slot`, searching outward. */
   const nearest = (slot) => {
     for (let d = 0; d < frames.length; d++) {
       if (frames[slot - d]) return frames[slot - d];
@@ -98,22 +99,65 @@ export function initDiver() {
     return null;
   };
 
-  // ---- rendering ------------------------------------------------------------
+  // ---- the hold: lift the rig into a sticky track, once ----------------------
+
+  let anchor = null;
+  let track = null;
+  let lifted = false;
+
+  /**
+   * The anchor is an invisible copy of the rig's box left where the rig was, inside
+   * the h1, so it keeps following the headline's layout (web fonts arriving, resizes).
+   * Every hold value is measured from it; nothing is hard-coded.
+   */
+  const measureHold = () => {
+    if (!lifted) return;
+    const a = anchor.getBoundingClientRect();
+    const h = hero.getBoundingClientRect();
+    hero.style.setProperty('--diver-track-top', `${Math.round(a.top - h.top)}px`);
+    hero.style.setProperty('--diver-left', `${Math.round(a.left - h.left)}px`);
+    // The viewport offset to hold at: where the diver rests with the page at the top.
+    hero.style.setProperty('--diver-hold-top', `${Math.round(a.top + window.scrollY)}px`);
+  };
+
+  const lift = () => {
+    if (lifted) return;
+    anchor = document.createElement('div');
+    anchor.className = rig.className;
+    anchor.setAttribute('aria-hidden', 'true');
+    anchor.style.visibility = 'hidden';
+    rig.before(anchor);
+
+    track = document.createElement('div');
+    track.className = 'diver-track';
+    track.setAttribute('aria-hidden', 'true');
+    const sticky = document.createElement('div');
+    sticky.className = 'diver-sticky';
+    track.append(sticky);
+    hero.prepend(track);
+
+    sticky.append(rig);
+    rig.classList.add('is-lifted');
+    lifted = true;
+    measureHold();
+  };
+
+  const unlift = () => {
+    if (!lifted) return;
+    anchor.replaceWith(rig);
+    rig.classList.remove('is-lifted');
+    track.remove();
+    anchor = null;
+    track = null;
+    lifted = false;
+  };
+
+  // ---- per-scroll rendering: which frame, how opaque the band ---------------
 
   const measure = () => {
     const share = window.innerHeight * TURN_VIEWPORT_SHARE;
     turnDistance = Math.min(MAX_TURN_PX, Math.max(MIN_TURN_PX, share));
-
-    // Document positions with the current hold taken back out. While held, the rig
-    // stays at its resting screen position and the band rises by 1px per 1px of scroll,
-    // so the band covers the diver after exactly (bandTop - rigTop) of scroll.
-    if (curtain) {
-      const rigTop = rig.getBoundingClientRect().top + window.scrollY - appliedHold;
-      const bandTop = curtain.getBoundingClientRect().top + window.scrollY;
-      coverDistance = Math.max(turnDistance, bandTop - rigTop);
-    } else {
-      coverDistance = turnDistance;
-    }
+    measureHold();
   };
 
   const render = () => {
@@ -125,10 +169,9 @@ export function initDiver() {
     const position = Math.min(1, scrolled / turnDistance) * (frames.length - 1);
     const base = Math.min(frames.length - 2, Math.floor(position));
     const blend = position - base;
-    const hold = Math.round(Math.min(scrolled, coverDistance));
-
     const closed = Math.min(1, scrolled / CURTAIN_CLOSED_PX);
-    const key = `${base}|${blend.toFixed(2)}|${hold}|${closed.toFixed(2)}`;
+
+    const key = `${base}|${blend.toFixed(2)}|${closed.toFixed(2)}`;
     if (key === lastKey) return;
     lastKey = key;
 
@@ -144,12 +187,6 @@ export function initDiver() {
         ctx.globalAlpha = 1;
       }
     }
-
-    // 2D on purpose. translate3d promotes the rig to its own compositing layer, and
-    // there mix-blend-mode loses the hero glow behind it: the render's black shows
-    // as a box again. Verified by A/B in the browser, not assumed.
-    rig.style.transform = `translate(0, ${hold}px)`;
-    appliedHold = hold;
 
     // Mixed from the ink-2 token rather than a literal, so the band keeps following
     // the theme. At 0 scroll this equals the markup's own bg-ink-2/60.
@@ -174,44 +211,47 @@ export function initDiver() {
       render(); // setTimeout path: still renders where rAF is paused (hidden tabs)
     }, RESIZE_DEBOUNCE_MS);
   };
+  const heroObserver = new ResizeObserver(onResize);
 
   const start = () => {
+    if (running) return;
     running = true;
+    // Straight away — not after the first frame has loaded — so a reload that
+    // restores a mid-page scroll never shows the diver in the wrong place first.
+    lift();
     measure();
-    lastKey = '';
     render();
-    canvas.setAttribute('data-ready', '');
+    heroObserver.observe(hero);
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', onResize);
-    // The remaining frames (~2 MB, half that on phones) are fetched only when the
-    // turn will actually play.
-    if (!restRequested) {
-      restRequested = true;
-      loadRest();
-    }
+
+    loadFrame(0).then(() => {
+      if (!running) return;
+      lastKey = '';
+      render();
+      canvas.setAttribute('data-ready', '');
+      // The remaining frames (~2 MB, half that on phones) are fetched only when the
+      // turn will actually play.
+      if (!restRequested) {
+        restRequested = true;
+        loadRest();
+      }
+    });
   };
 
-  // Reduced motion: the resting <img> only — canvas hidden, no hold, no turn.
+  // Reduced motion: the resting <img> in its original place — no hold, no turn.
   const stop = () => {
     running = false;
+    heroObserver.disconnect();
     window.removeEventListener('scroll', schedule);
     window.removeEventListener('resize', onResize);
     canvas.removeAttribute('data-ready');
-    rig.style.removeProperty('transform');
-    appliedHold = 0;
     curtain?.style.removeProperty('background-color');
+    unlift();
     lastKey = '';
   };
 
   const apply = () => (reducedMotion.matches ? stop() : start());
-
-  // Start only once the resting frame is on the canvas, so switching from the <img>
-  // to the canvas never shows an empty frame.
-  loadFrame(0).then(() => {
-    apply();
-    reducedMotion.addEventListener('change', () => {
-      stop();
-      apply();
-    });
-  });
+  reducedMotion.addEventListener('change', apply);
+  apply();
 }
